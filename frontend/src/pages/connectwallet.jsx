@@ -34,7 +34,7 @@ export default function ConnectWalletComponent() {
       <div className="absolute top-4 right-4">
         <ModeToggle />
       </div>
-      <ConnectKitButton mode={theme.theme} />
+      <ConnectKitButton theme={theme.theme} />
     </div>
   );
 }
