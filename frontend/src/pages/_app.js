@@ -18,7 +18,12 @@ export default function App({ Component, pageProps }) {
 
 
   return (
-    <Provider>
+    <Provider
+      attribute="class"
+      defaultTheme="system"
+      enableSystem
+      disableTransitionOnChange
+    >
       <WagmiConfig config={config}>
         <ConnectKitProvider debugMode>
           <Component {...pageProps} />

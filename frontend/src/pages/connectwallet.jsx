@@ -2,6 +2,8 @@ import {ConnectKitButton} from "connectkit";
 import {useEffect} from "react";
 import {useConnect, useAccount, useNetwork} from "wagmi";
 import {useRouter} from "next/router";
+import {useTheme} from "next-themes";
+import {ModeToggle} from "@/components/Toggletheme";
 
 export default function ConnectWalletComponent() {
   const {isConnected} = useAccount();
@@ -9,7 +11,7 @@ export default function ConnectWalletComponent() {
     useConnect();
   const {chain} = useNetwork();
   const router = useRouter();
-
+  const theme = useTheme();
   useEffect(() => {
     console.log(chain);
 
@@ -28,8 +30,11 @@ export default function ConnectWalletComponent() {
     });
   }
   return (
-    <div className="h-screen grid place-content-center">
-      <ConnectKitButton />
+    <div className="relative h-screen grid place-content-center">
+      <div className="absolute top-4 right-4">
+        <ModeToggle />
+      </div>
+      <ConnectKitButton mode={theme.theme} />
     </div>
   );
 }

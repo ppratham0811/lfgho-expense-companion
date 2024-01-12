@@ -15,6 +15,7 @@ import {disconnect} from "@wagmi/core";
 
 import {toast} from "@/components/ui/use-toast";
 import {ConnectKitButton} from "connectkit";
+import {useTheme} from "next-themes";
 
 export default function Dashboard() {
   const {isConnected, address} = useAccount();
@@ -42,6 +43,8 @@ export default function Dashboard() {
       description: "Wallet disconnected successfully",
     });
   };
+
+  const theme = useTheme();
 
   useEffect(() => setMounted(true), []);
   if (!mounted) return null;
@@ -77,7 +80,7 @@ export default function Dashboard() {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu> */}
-          <ConnectKitButton />
+          <ConnectKitButton mode={theme.theme} />
           <ModeToggle />
         </div>
       </div>
