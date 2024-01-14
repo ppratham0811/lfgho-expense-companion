@@ -34,13 +34,21 @@ contract Pool {
         POOL.supply(asset, amount, onBehalfOf, referralCode);
     }
 
-    function withdrawFromSupply(
+    function returnStakedAssets(
         address _tokenAddress,
         uint256 _amount
     ) external returns (uint256) {
         address asset = _tokenAddress;
         uint256 amount = _amount;
-        address to = address(this);
+        address to = msg.sender;
         return POOL.withdraw(asset, amount, to);
+    }
+
+    function stakeToSupply(address _token, uint256 _amount) {
+        address asset = _token;
+        uint256 amount = _amount;
+        address onBehalfOf = msg.sender;
+        uint16 referralCode = 0;
+        POOL.deposit(asset, amount, onBehalfOf, referralCode);
     }
 }

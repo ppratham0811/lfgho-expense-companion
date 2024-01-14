@@ -6,10 +6,9 @@ import "hardhat/console.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC4626.sol";
 import {IPool} from "@aave/core-v3/contracts/interfaces/IPool.sol";
 import {IPoolAddressesProvider} from "@aave/core-v3/contracts/interfaces/IPoolAddressesProvider.sol";
-import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "../gho-contract/contracts/facilitators/aave/tokens/GhoAToken.sol";
 
-contract LFGHOVault is ERC4626, IERC4626 {
+contract LFGHOVault is ERC4626 {
     IPool public immutable POOL;
     IPoolAddressesProvider public immutable ADDRESSES_PROVIDER;
     address payable owner;
@@ -23,9 +22,9 @@ contract LFGHOVault is ERC4626, IERC4626 {
         owner = payable(msg.sender);
     }
 
-    function stakeMoneyToVault(address _token, uint256 _amount) external {}
+    // function stakeAssetToVault(address _token, uint256 _amount) external {}
 
-    function stakeMoneyinLiquidityPool(
+    function stakeTokensToVault(
         address _tokenAddress,
         uint256 _amount
     ) external {
@@ -35,5 +34,18 @@ contract LFGHOVault is ERC4626, IERC4626 {
         address onBehalfOf = msg.sender;
         uint16 referralCode = 0;
         POOL.deposit(asset, amount, onBehalfOf, referralCode);
+    }
+
+    function borrowGhoToken(address _tokenAddress, address _userAddress,uint256 _amount) external {
+        address asset = _tokenAddress;
+        address onBehalfOf = _userAddress;
+        uint256 amount = _amount;
+        uint16 referralCode = 0;
+        uint256 interestRateMode = 0
+        POOL.borrow(asset, amount, interestRateMode, referralCode, onBehalfOf);
+    }
+
+    function repayAndBurn() external {
+      
     }
 }
