@@ -1,5 +1,5 @@
-// SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.8.9;
+// SPDX-License-Identifier: MIT
+pragma solidity 0.8.20;
 
 // │      PoolAddressesProvider-Polygon      │ '0x4CeDCB57Af02293231BAA9D39354D6BFDFD251e0' │
 
@@ -44,7 +44,7 @@ contract Pool {
         return POOL.withdraw(asset, amount, to);
     }
 
-    function stakeToSupply(address _token, uint256 _amount) {
+    function stakeToSupply(address _token, uint256 _amount) public {
         address asset = _token;
         uint256 amount = _amount;
         address onBehalfOf = msg.sender;

@@ -5,29 +5,19 @@ module.exports = {
   solidity: {
     compilers: [
       {
+        version: "0.8.10",
+        settings: {}
+      },
+      {
         version: "0.8.20",
-        settings: {
-          optimizer: {
-            enabled: true,
-            runs: 150,
-          }
-        }
+        settings: {}
       },
 
-      {
-        version: "0.8.10",
-        settings: {
-          optimizer: {
-            enabled: true,
-            runs: 150,
-          },
-        }
-      },
     ]
   },
   networks: {
     forking: {
-      url: `https://eth-mainnet.alchemyapi.io/v2/${process.env.API_KEY}`,
+      url: `https://eth-sepolia.g.alchemy.com/v2/${process.env.API_KEY}`,
     }
   }
 };
