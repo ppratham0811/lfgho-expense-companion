@@ -4,11 +4,11 @@ pragma solidity 0.8.20;
 // import "../../gho-contract/contracts/gho/GhoToken.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC4626.sol";
 // import "../../gho-contract/contracts/facilitators/aave/tokens/GhoAToken.sol";
-import "../../gho-contract/contracts/gho/interfaces/IGhoToken.sol";
+import "https://github.com/jaydeepdey03/gho-contract/blob/main/contracts/gho/interfaces/IGhoToken.sol";
 import {IPoolAddressesProvider} from "@aave/core-v3/contracts/interfaces/IPoolAddressesProvider.sol";
 import {IPool} from "@aave/core-v3/contracts/interfaces/IPool.sol";
 
-contract NewVault is ERC4626, IGhoToken {
+contract Vault is ERC4626, IGhoToken {
     IPool public immutable POOL;
     IPoolAddressesProvider public immutable ADDRESSES_PROVIDER;
     address payable owner;
@@ -33,25 +33,29 @@ contract NewVault is ERC4626, IGhoToken {
         owner = payable(msg.sender);
     }
 
-    function stakeTokensToVault(
-        address _tokenAddress,
-        uint256 _amount
-    ) external payable {
-        // fn which will add money to the liquidity pool and give GHO Token to the msg.sender guy
-        address asset = _tokenAddress;
-        uint256 amount = _amount;
-        address onBehalfOf = msg.sender;
-        uint16 referralCode = 0;
-        POOL.deposit(asset, amount, onBehalfOf, referralCode);
-    }
-
-    function mint(address requester, uint256 amount) external override {
+    function mintGHO(address requester, uint256 amount) private {
         address facilitator = msg.sender;
         require(_allowedFacilitators[facilitator], "You are not a facilitator");
         uint256 shares = amount;
         address receiver = requester;
-        ERC4626.mint(shares, receiver);
+        mint(shares, receiver);
     }
+
+    function stakeTokensToVault(
+        address _tokenAddress,
+        uint256 _amount,
+        address _onBehalfOf
+    ) external payable {
+        // fn which will add money to the vault and give GHO Token to the msg.sender guy
+        address asset = _tokenAddress;
+        uint256 amount = _amount;
+        address onBehalfOf = _onBehalfOf;
+        uint16 referralCode = 0;
+        POOL.deposit(asset, amount, onBehalfOf, referralCode);
+        mintGHO(msg.sender, amount);
+    }
+
+    // function mint(address r, uint256 a) external override {}
 
     function burn(uint256 amount) external override {}
 
