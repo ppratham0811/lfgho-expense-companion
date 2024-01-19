@@ -12,7 +12,6 @@ contract PoolHelpers {
     Pool public POOL;
     ERC20 private immutable DAI;
 
-
     constructor(address _addressProvider, address asset_) {
         ADDRESSES_PROVIDER = AddressProvider(_addressProvider);
         DAI = ERC20(asset_);
@@ -23,7 +22,12 @@ contract PoolHelpers {
         POOL = Pool(ADDRESSES_PROVIDER.getPoolAddress());
     }
 
-    function createSupply(address asset_, uint256 amount_, address onBehalfOf_, uint16 referralCode_) public {
+    function createSupply(
+        address asset_,
+        uint256 amount_,
+        address onBehalfOf_,
+        uint16 referralCode_
+    ) public {
         require(address(POOL) != address(0), "Pool address not set");
         POOL.supply(asset_, amount_, onBehalfOf_, referralCode_);
     }
@@ -32,7 +36,7 @@ contract PoolHelpers {
         return ERC20(_asset).balanceOf(address(this));
     }
 
-    function approveLINK(
+    function approveDAI(
         uint256 _amount,
         address _poolContractAddress
     ) external returns (bool) {

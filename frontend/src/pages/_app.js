@@ -1,9 +1,9 @@
-import '@/styles/globals.css'
-import { WagmiConfig, createConfig } from 'wagmi';
-import { polygonMumbai, avalancheFuji } from 'wagmi/chains';
-import { ConnectKitProvider, getDefaultConfig } from 'connectkit';
 import Provider from '@/Provider';
+import '@/styles/globals.css';
+import { ConnectKitProvider, getDefaultConfig } from 'connectkit';
 import { useEffect } from 'react';
+import { WagmiConfig, createConfig } from 'wagmi';
+import { arbitrumSepolia, sepolia } from 'wagmi/chains';
 
 export default function App({ Component, pageProps }) {
 
@@ -12,7 +12,7 @@ export default function App({ Component, pageProps }) {
       appName: 'LFGHO hackathon',
       //infuraId: process.env.NEXT_PUBLIC_INFURA_ID,
       //alchemyId:  process.env.NEXT_PUBLIC_ALCHEMY_ID,
-      chains: [polygonMumbai, avalancheFuji],
+      chains: [arbitrumSepolia, sepolia],
       autoConnect: true,
       walletConnectProjectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID,
     })

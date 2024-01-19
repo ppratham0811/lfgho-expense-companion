@@ -1,9 +1,10 @@
-import {ConnectKitButton} from "connectkit";
-import {useEffect} from "react";
-import {useConnect, useAccount, useNetwork} from "wagmi";
-import {useRouter} from "next/router";
-import {useTheme} from "next-themes";
 import {ModeToggle} from "@/components/Toggletheme";
+import {Button} from "@/components/ui/button";
+import {ConnectKitButton} from "connectkit";
+import {useTheme} from "next-themes";
+import {useRouter} from "next/router";
+import {useEffect} from "react";
+import {useAccount, useConnect, useNetwork, useSwitchNetwork} from "wagmi";
 
 export default function ConnectWalletComponent() {
   const {isConnected} = useAccount();
@@ -12,13 +13,14 @@ export default function ConnectWalletComponent() {
   const {chain} = useNetwork();
   const router = useRouter();
   const theme = useTheme();
+
   useEffect(() => {
     console.log(chain);
 
     // if (isConnected && chain.id != "80001" && chain.id != "43113") {
     //   router.push("/switchnetwork");
     // }
-    if (chain && (chain.id == 80001 || chain.id == 43113) && isConnected) {
+    if (chain && (chain.id == 421614 || chain.id == 11155111) && isConnected) {
       router.push("/dashboard");
     }
   }, [isConnected, chain, router]);

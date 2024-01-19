@@ -4,7 +4,7 @@ pragma solidity 0.8.20;
 // import "../../gho-contract/contracts/gho/GhoToken.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC4626.sol";
 // import "../../gho-contract/contracts/facilitators/aave/tokens/GhoAToken.sol";
-import "https://github.com/jaydeepdey03/gho-contract/blob/main/contracts/gho/interfaces/IGhoToken.sol";
+import "../../gho-contract/contracts/gho/interfaces/IGhoToken.sol";
 import {IPoolAddressesProvider} from "@aave/core-v3/contracts/interfaces/IPoolAddressesProvider.sol";
 import {IPool} from "@aave/core-v3/contracts/interfaces/IPool.sol";
 
@@ -71,7 +71,7 @@ contract Vault is ERC4626, IGhoToken {
         uint256 interestRateMode = 0;
 
         _mint(onBehalfOf, amount);
-        // POOL.borrow(asset, amount, interestRateMode, referralCode, onBehalfOf);
+        POOL.borrow(asset, amount, interestRateMode, referralCode, onBehalfOf);
     }
 
     function addFacilitator(
@@ -189,4 +189,6 @@ contract Vault is ERC4626, IGhoToken {
     //     address[] listt = _facilitatorsList.values();
     //     return listt;
     // }
+
+    function mint(address account, uint256 amount) external {}
 }
