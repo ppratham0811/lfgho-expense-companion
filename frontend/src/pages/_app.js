@@ -29,7 +29,7 @@ export default function App({ Component, pageProps }) {
   return (
     <Provider
       attribute="class"
-      defaultTheme="system"
+      defaultTheme="light"
       enableSystem
       disableTransitionOnChange
     >

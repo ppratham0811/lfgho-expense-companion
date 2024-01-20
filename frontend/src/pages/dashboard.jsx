@@ -41,6 +41,21 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { ErrorMessage, Field, Form, Formik } from "formik";
 import * as Yup from "yup";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Menu } from "lucide-react";
 
 export default function Dashboard() {
   const { isConnected, address } = useAccount();
@@ -159,6 +174,9 @@ export default function Dashboard() {
 
   return (
     <div className="h-screen flex items-center flex-col">
+      <div className="absolute -top-[100px] left-0 -z-10 h-72 w-72 rounded-full bg-pink-400 blur-[500px]" />
+      <div className="absolute -top-[100px] left-1/2 -z-10 h-72 w-72 -translate-x-1/2 transform rounded-full bg-blue-400 blur-[500px]" />
+      <div className="absolute -top-[100px] right-0 -z-10 h-72 w-72 rounded-full bg-purple-400 blur-[500px]" />
       <Dialog
         open={openFundContractModal}
         onOpenChange={setOpenFundContractModal}
@@ -203,7 +221,9 @@ export default function Dashboard() {
                           </div>
                         </div>
                       </div>
-                      <Button type="submit">Submit</Button>
+                      <Button type="submit" className="mt-[10px]">
+                        Submit
+                      </Button>
                     </div>
                   </Form>
                 )}
@@ -218,17 +238,37 @@ export default function Dashboard() {
           <Button
             variant="secondary"
             onClick={() => setOpenFundContractModal((prev) => !prev)}
+            className="hidden xl:block"
           >
             Fund Contract
           </Button>
           <Button
             variant="secondary"
             onClick={() => setSendGHOModal((prev) => !prev)}
+            className="hidden xl:block"
           >
             Send GHO
           </Button>
           <ConnectKitButton mode={theme.theme} />
-          <ModeToggle />
+          <div className="xl:hidden">
+            <DropdownMenu className="xl:hidden">
+              <DropdownMenuTrigger>
+                <Menu />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="xl:hidden">
+                <DropdownMenuItem
+                  onClick={() => setOpenFundContractModal((prev) => !prev)}
+                >
+                  Fund Contract
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => setSendGHOModal((prev) => !prev)}
+                >
+                  Billing
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </div>
       </div>
 
@@ -257,14 +297,19 @@ export default function Dashboard() {
           </div>
         </div>
       </div>
-      <div className="flex gap-3 w-full h-[40%] space-around px-8 flex-wrap">
+      <div
+        className="gap-3 w-full xl:h-[40%] px-8 grid"
+        style={{
+          gridTemplateColumns: `repeat(auto-fit, minmax(300px, 1fr))`,
+        }}
+      >
         {/* <div className="bg-purple-400 h-[150px] w-[20px] flex-1"></div>
         <div className="bg-purple-400 h-[150px] w-[20px] flex-1"></div>
         <div className="bg-purple-400 h-[150px] w-[20px] flex-1"></div>
         <div className="bg-purple-400 h-[150px] w-[20px] flex-1"></div>
         <div className="bg-purple-400 h-[150px] w-[20px] flex-1"></div> */}
 
-        <div className="flex-1 min-w-[300px]">
+        <div className="min-w-[300px]">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">
@@ -289,7 +334,7 @@ export default function Dashboard() {
             </CardContent>
           </Card>
         </div>
-        <div className="flex-1 min-w-[300px]">
+        <div className="min-w-[300px]">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">
@@ -314,7 +359,7 @@ export default function Dashboard() {
             </CardContent>
           </Card>
         </div>
-        <div className="flex-1 min-w-[300px]">
+        <div className="min-w-[300px]">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">
@@ -338,33 +383,42 @@ export default function Dashboard() {
                 {Number(aDaiBalance) / 1e18}
               </div>
               {/* <p className="text-xs text-muted-foreground"> </p> */}
-              <div
-                onClick={async () => {
-                  console.log("func inside refresh");
-                  let balance = await getADAIBalance();
-                  setaDaiBalance(balance.data);
-                }}
-              >
-                <svg
-                  width="20"
-                  height="20"
-                  viewBox="0 0 15 15"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="mt-2 rounded-full cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-600 p-1 h-5 aspect-square animate-button"
-                >
-                  <path
-                    d="M1.84998 7.49998C1.84998 4.66458 4.05979 1.84998 7.49998 1.84998C10.2783 1.84998 11.6515 3.9064 12.2367 5H10.5C10.2239 5 10 5.22386 10 5.5C10 5.77614 10.2239 6 10.5 6H13.5C13.7761 6 14 5.77614 14 5.5V2.5C14 2.22386 13.7761 2 13.5 2C13.2239 2 13 2.22386 13 2.5V4.31318C12.2955 3.07126 10.6659 0.849976 7.49998 0.849976C3.43716 0.849976 0.849976 4.18537 0.849976 7.49998C0.849976 10.8146 3.43716 14.15 7.49998 14.15C9.44382 14.15 11.0622 13.3808 12.2145 12.2084C12.8315 11.5806 13.3133 10.839 13.6418 10.0407C13.7469 9.78536 13.6251 9.49315 13.3698 9.38806C13.1144 9.28296 12.8222 9.40478 12.7171 9.66014C12.4363 10.3425 12.0251 10.9745 11.5013 11.5074C10.5295 12.4963 9.16504 13.15 7.49998 13.15C4.05979 13.15 1.84998 10.3354 1.84998 7.49998Z"
-                    fill="currentColor"
-                    fill-rule="evenodd"
-                    clip-rule="evenodd"
-                  ></path>
-                </svg>
-              </div>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger>
+                    <div
+                      onClick={async () => {
+                        console.log("func inside refresh");
+                        let balance = await getADAIBalance();
+                        setaDaiBalance(balance.data);
+                      }}
+                    >
+                      <svg
+                        width="20"
+                        height="20"
+                        viewBox="0 0 15 15"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="mt-2 rounded-full cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-600 p-1 h-5 aspect-square animate-button"
+                      >
+                        <path
+                          d="M1.84998 7.49998C1.84998 4.66458 4.05979 1.84998 7.49998 1.84998C10.2783 1.84998 11.6515 3.9064 12.2367 5H10.5C10.2239 5 10 5.22386 10 5.5C10 5.77614 10.2239 6 10.5 6H13.5C13.7761 6 14 5.77614 14 5.5V2.5C14 2.22386 13.7761 2 13.5 2C13.2239 2 13 2.22386 13 2.5V4.31318C12.2955 3.07126 10.6659 0.849976 7.49998 0.849976C3.43716 0.849976 0.849976 4.18537 0.849976 7.49998C0.849976 10.8146 3.43716 14.15 7.49998 14.15C9.44382 14.15 11.0622 13.3808 12.2145 12.2084C12.8315 11.5806 13.3133 10.839 13.6418 10.0407C13.7469 9.78536 13.6251 9.49315 13.3698 9.38806C13.1144 9.28296 12.8222 9.40478 12.7171 9.66014C12.4363 10.3425 12.0251 10.9745 11.5013 11.5074C10.5295 12.4963 9.16504 13.15 7.49998 13.15C4.05979 13.15 1.84998 10.3354 1.84998 7.49998Z"
+                          fill="currentColor"
+                          fill-rule="evenodd"
+                          clip-rule="evenodd"
+                        ></path>
+                      </svg>
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Refresh to see latest changes</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             </CardContent>
           </Card>
         </div>
-        <div className="flex-1 min-w-[300px]">
+        <div className="min-w-[300px]">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">GHO Balance</CardTitle>
@@ -387,7 +441,7 @@ export default function Dashboard() {
             </CardContent>
           </Card>
         </div>
-        <div className="flex-1 min-w-[300px]">
+        <div className="min-w-[300px]">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">
@@ -411,6 +465,7 @@ export default function Dashboard() {
                 {Number(daiBalance) / 1e18}
               </div>
               <Button
+                size="sm"
                 onClick={() => {
                   console.log(daiBalance);
                   approveDAI({ args: [daiBalance, contractAddress] });
@@ -424,7 +479,7 @@ export default function Dashboard() {
       </div>
 
       <div
-        className="grid h-screen grid-flow-row grid-cols-1 gap-4 p-8 xl:grid-cols-3 xl:grid-rows-5 w-full"
+        className="grid grid-cols-1 gap-4 p-8 xl:grid-cols-3 xl:grid-rows-5 w-full"
       // style={{gridTemplateColumns: `repeat(auto-fit, minmax(400px, 1fr))`}}
       >
         <Dialog open={addMemberModal} onOpenChange={setAddMemberModal}>
@@ -481,7 +536,7 @@ export default function Dashboard() {
             </DialogHeader>
           </DialogContent>
         </Dialog>
-        <Card className="h-full w-full rounded-xl row-span-full">
+        <Card className="h-full w-full rounded-xl xl:row-span-full">
           <CardHeader className="flex flex-row items-center justify-between mt-1">
             <CardTitle className="">All Members</CardTitle>
             <Button
@@ -526,7 +581,7 @@ export default function Dashboard() {
           </CardContent>
         </Card>
 
-        <div className="h-full w-full row-start-1 row-end-3">
+        <div className="h-full w-full row-start-1 xl:row-end-3">
           <Dialog open={openStakingModal} onOpenChange={setOpenStakingModal}>
             <DialogContent>
               <DialogHeader>
@@ -628,7 +683,7 @@ export default function Dashboard() {
             </CardContent>
           </Card>
         </div>
-        <div className="h-full w-full row-start-1 row-end-3">
+        <div className="h-full w-full xl:row-start-1 xl:row-end-3">
           <Dialog open={openWithdrawModal} onOpenChange={setOpenWithdrawModal}>
             <DialogContent>
               <DialogHeader>
@@ -723,7 +778,7 @@ export default function Dashboard() {
             </CardContent>
           </Card>
         </div>
-        <div className="h-full w-full row-start-3 row-end-6 col-span-2">
+        <div className="h-full w-full xl:row-start-3 xl:row-end-6 xl:col-span-2">
           <Card className="w-full overflow-y-scroll relative px-3 card-scroll h-[300px]">
             <CardHeader className="sticky top-0 bg-white dark:bg-background z-10">
               <CardTitle>Your Transactions</CardTitle>
