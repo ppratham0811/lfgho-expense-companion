@@ -260,7 +260,7 @@ export default function Dashboard() {
                 <DropdownMenuItem
                   onClick={() => setSendGHOModal((prev) => !prev)}
                 >
-                  Billing
+                  Send GHO
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
