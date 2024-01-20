@@ -37,7 +37,7 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { Form, Formik } from "formik";
+import { ErrorMessage, Field, Form, Formik } from "formik";
 import * as Yup from "yup";
 
 export default function Dashboard() {
@@ -79,6 +79,7 @@ export default function Dashboard() {
 
   useEffect(() => setMounted(true), []);
   if (!mounted) return null;
+
   return (
     <div className="h-screen flex items-center flex-col">
       <div className="absolute top-5 right-10">
@@ -98,41 +99,9 @@ export default function Dashboard() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Send GHO</DialogTitle>
-            <DialogDescription>
-              <div className="h-[500px] flex">
-                <div className="w-full p-4 flex flex-col space-y-3">
-                  <Label htmlFor="email" className="ml-1">
-                    Amount
-                  </Label>
-                  <div className="w-full border-[1px] border-slate-200 h-16 rounded-lg flex flex-col">
-                    <div className="flex h-[60%]">
-                      <Input
-                        type="number"
-                        id="amount"
-                        placeholder="0.00"
-                        className="flex-1 appearance-none focus-visible:ring-0 shadow-none border-none outline-none text-lg"
-                      />
-
-                      <div className="flex gap-2 items-center pr-4">
-                        <img
-                          src="/gho.svg"
-                          alt="gho"
-                          className="h-5 aspect-square"
-                        />
-                        <p>GHO</p>
-                      </div>
-                    </div>
-                    <div className="ml-3 text-xs flex justify-between mr-3">
-                      <div>$34</div>
-                      <div className="flex text-xs gap-1">
-                        <div>GHO Balance: 2</div>
-                        <p className="font-bold">MAX</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </DialogDescription>
+            <div className="h-[500px] w-[600px]">
+              <DialogDescription></DialogDescription>
+            </div>
           </DialogHeader>
         </DialogContent>
       </Dialog>
@@ -283,27 +252,37 @@ export default function Dashboard() {
             <DialogHeader>
               <DialogTitle>Add New Member</DialogTitle>
               <DialogDescription className="h-fit">
-                <Formik initialValues={{}} onSubmit={() => {}}>
+                <Formik
+                  initialValues={{ role: "", address: "" }}
+                  onSubmit={(values, _) => console.log(values)}
+                >
                   {(formik) => (
                     <Form className="py-5 flex flex-col space-y-6">
                       <div className="flex">
                         <Label htmlFor="address" className="w-[100px] my-auto">
                           Address:{" "}
                         </Label>
-                        <Input
+                        <Field
+                          as={Input}
+                          name="address"
                           type="text"
                           id="address"
-                          placeholder="0x3r34...."
+                          placeholder="0x45fef..."
                           className="flex-1"
                         />
+                        <ErrorMessage name="address" />
                       </div>
                       <div className="flex">
                         <Label htmlFor="role" className="w-[100px] my-auto">
                           Role:{" "}
                         </Label>
-                        <Select>
+                        <Select
+                          onValueChange={(val) => {
+                            formik.setFieldValue("role", val);
+                          }}
+                        >
                           <SelectTrigger className="flex-1">
-                            <SelectValue placeholder="Select Role" />
+                            <SelectValue placeholder="Enter Role" />
                           </SelectTrigger>
                           <SelectContent>
                             <SelectItem value="facilitator">
@@ -312,8 +291,9 @@ export default function Dashboard() {
                             <SelectItem value="member">Member</SelectItem>
                           </SelectContent>
                         </Select>
+                        <ErrorMessage name="role" />
                       </div>
-                      <Button>Submit</Button>
+                      <Button type="submit">Submit</Button>
                     </Form>
                   )}
                 </Formik>
