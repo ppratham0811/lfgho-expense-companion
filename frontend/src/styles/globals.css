@@ -87,13 +87,13 @@
 }
 
 .animate-button:hover {
-  animation: spin 1s linear;
+  animation: spin 0.5s linear 1;
 
 }
 
 @keyframes spin {
   to {
-    transform: rotate(270deg);
+    transform: rotate(135deg);
   }
 }
 

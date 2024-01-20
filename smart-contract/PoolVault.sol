@@ -50,7 +50,7 @@ contract PoolBorrow {
     constructor() {
         // owner = payable(msg.sender);
         // facilitators.push(msg.sender); // added owner as facilator
-        isFacilitator[msg.sender];
+        isFacilitator[msg.sender] = true;
         allmembers.push(msg.sender);
         s_router = IRouterClient(0x0BF3dE8c5D3e8A2B34D2BEeB17ABfCeBaf363A59);
         s_linkToken = IERC20(0x779877A7B0D9E8603169DdbD7836e478b4624789);

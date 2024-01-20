@@ -1,18 +1,19 @@
-import {ModeToggle} from "@/components/Toggletheme";
-import {Button} from "@/components/ui/button";
-import {ConnectKitButton} from "connectkit";
-import {useTheme} from "next-themes";
-import {useRouter} from "next/router";
-import {useEffect} from "react";
-import {useAccount, useConnect, useNetwork, useSwitchNetwork} from "wagmi";
+import { ModeToggle } from "@/components/Toggletheme";
+import { Button } from "@/components/ui/button";
+import { ConnectKitButton } from "connectkit";
+import { useTheme } from "next-themes";
+import { useRouter } from "next/router";
+import { useEffect } from "react";
+import { useAccount, useConnect, useNetwork, useSwitchNetwork } from "wagmi";
 
 export default function ConnectWalletComponent() {
-  const {isConnected} = useAccount();
-  const {connect, connectors, error, isLoading, pendingConnector} =
+  const { isConnected } = useAccount();
+  const { connect, connectors, error, isLoading, pendingConnector } =
     useConnect();
-  const {chain} = useNetwork();
+  const { chain } = useNetwork();
   const router = useRouter();
   const theme = useTheme();
+
 
   useEffect(() => {
     console.log(chain);
