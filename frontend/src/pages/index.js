@@ -13,7 +13,7 @@ export default function Home() {
       suppressHydrationWarning
     >
       <p className="font-bold text-2xl m-4">
-        Get Started with Metamask Auth (Built with ConnectKit)
+        Built with ConnectKit, AAVE, Chainlink CCIP for LFGHO
       </p>
       <div className="absolute top-4 right-4">
         <ModeToggle />
