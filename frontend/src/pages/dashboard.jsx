@@ -35,6 +35,10 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import {Label} from "@/components/ui/label";
+import {Input} from "@/components/ui/input";
+import {Form, Formik} from "formik";
+import * as Yup from "yup";
 
 export default function Dashboard() {
   const {isConnected, address} = useAccount();
@@ -48,6 +52,7 @@ export default function Dashboard() {
   const [openStakingModal, setOpenStakingModal] = useState(false);
   const [openWithdrawModal, setOpenWithdrawModal] = useState(false);
   const [sendGHOModal, setSendGHOModal] = useState(false);
+  const [addMemberModal, setAddMemberModal] = useState(false);
 
   useEffect(() => {
     if (!isConnected) {
@@ -93,9 +98,41 @@ export default function Dashboard() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Send GHO</DialogTitle>
-            <div className="h-[500px] w-[600px]">
-              <DialogDescription></DialogDescription>
-            </div>
+            <DialogDescription>
+              <div className="h-[500px] flex">
+                <div className="w-full p-4 flex flex-col space-y-3">
+                  <Label htmlFor="email" className="ml-1">
+                    Amount
+                  </Label>
+                  <div className="w-full border-[1px] border-slate-200 h-16 rounded-lg flex flex-col">
+                    <div className="flex h-[60%]">
+                      <Input
+                        type="number"
+                        id="amount"
+                        placeholder="0.00"
+                        className="flex-1 appearance-none focus-visible:ring-0 shadow-none border-none outline-none text-lg"
+                      />
+
+                      <div className="flex gap-2 items-center pr-4">
+                        <img
+                          src="/gho.svg"
+                          alt="gho"
+                          className="h-5 aspect-square"
+                        />
+                        <p>GHO</p>
+                      </div>
+                    </div>
+                    <div className="ml-3 text-xs flex justify-between mr-3">
+                      <div>$34</div>
+                      <div className="flex text-xs gap-1">
+                        <div>GHO Balance: 2</div>
+                        <p className="font-bold">MAX</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </DialogDescription>
           </DialogHeader>
         </DialogContent>
       </Dialog>
@@ -241,13 +278,55 @@ export default function Dashboard() {
         className="grid h-screen grid-flow-row grid-cols-1 gap-4 p-8 xl:grid-cols-3 xl:grid-rows-5 w-full"
         // style={{gridTemplateColumns: `repeat(auto-fit, minmax(400px, 1fr))`}}
       >
+        <Dialog open={addMemberModal} onOpenChange={setAddMemberModal}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Add New Member</DialogTitle>
+              <DialogDescription className="h-fit">
+                <Formik initialValues={{}} onSubmit={() => {}}>
+                  {(formik) => (
+                    <Form className="py-5 flex flex-col space-y-6">
+                      <div className="flex">
+                        <Label htmlFor="address" className="w-[100px] my-auto">
+                          Address:{" "}
+                        </Label>
+                        <Input
+                          type="text"
+                          id="address"
+                          placeholder="0x3r34...."
+                          className="flex-1"
+                        />
+                      </div>
+                      <div className="flex">
+                        <Label htmlFor="role" className="w-[100px] my-auto">
+                          Role:{" "}
+                        </Label>
+                        <Select>
+                          <SelectTrigger className="flex-1">
+                            <SelectValue placeholder="Theme" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="light">Light</SelectItem>
+                            <SelectItem value="dark">Dark</SelectItem>
+                            <SelectItem value="system">System</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <Button>Submit</Button>
+                    </Form>
+                  )}
+                </Formik>
+              </DialogDescription>
+            </DialogHeader>
+          </DialogContent>
+        </Dialog>
         <Card className="h-full w-full rounded-xl row-span-full">
           <CardHeader className="flex flex-row items-center justify-between mt-1">
             <CardTitle className="">All Members</CardTitle>
             <Button
               className="m-0 w-fit"
               size={"sm"}
-              // onClick={() => setOpenNewAppointment((prev) => !prev)}
+              onClick={() => setAddMemberModal((prev) => !prev)}
             >
               Add New Member
             </Button>
