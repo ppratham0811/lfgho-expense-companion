@@ -1,7 +1,7 @@
 import { ModeToggle } from "@/components/Toggletheme";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import {
   Table,
   TableBody,
@@ -35,6 +35,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import useWeb3Context from '../hooks/useWeb3Context'
+
 
 export default function Dashboard() {
   const { isConnected, address } = useAccount();
@@ -52,6 +54,7 @@ export default function Dashboard() {
 
 
 
+  const { contractAddress, transferDAI } = useWeb3Context();
 
 
   useEffect(() => {
@@ -365,7 +368,7 @@ export default function Dashboard() {
           <Card className="h-full w-full">
             <CardHeader className="flex flex-row items-center justify-between px-4 pt-4 pb-1">
               <CardTitle>Your Supplies</CardTitle>
-              <Button size="sm">Stake</Button>
+              <Button size="sm" onClick={() => transferDAI()}>Stake</Button>
             </CardHeader>
             <CardContent className="px-3 pt- card-content">
               <Table>

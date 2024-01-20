@@ -1,17 +1,17 @@
-import Provider from '@/Provider';
-import '@/styles/globals.css';
-import { ConnectKitProvider, getDefaultConfig } from 'connectkit';
-import { useEffect } from 'react';
-import { WagmiConfig, createConfig } from 'wagmi';
-import { arbitrumSepolia, sepolia } from 'wagmi/chains';
+import Web3ContextProvider from "@/Context/Web3Context";
+import Provider from "@/Provider";
+import "@/styles/globals.css";
+import { ConnectKitProvider, getDefaultConfig } from "connectkit";
+import { useEffect } from "react";
+import { WagmiConfig, createConfig } from "wagmi";
+import { arbitrumSepolia, sepolia } from "wagmi/chains";
 
 export default function App({ Component, pageProps }) {
-
   const config = createConfig(
     getDefaultConfig({
-      appName: 'LFGHO hackathon',
+      appName: "LFGHO hackathon",
       //infuraId: process.env.NEXT_PUBLIC_INFURA_ID,
-      //alchemyId:  process.env.NEXT_PUBLIC_ALCHEMY_ID,
+      alchemyId: process.env.NEXT_PUBLIC_ALCHEMY_ID,
       chains: [arbitrumSepolia, sepolia],
       autoConnect: true,
       walletConnectProjectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID,
@@ -26,7 +26,6 @@ export default function App({ Component, pageProps }) {
     };
   }, []);
 
-
   return (
     <Provider
       attribute="class"
@@ -35,10 +34,12 @@ export default function App({ Component, pageProps }) {
       disableTransitionOnChange
     >
       <WagmiConfig config={config}>
-        <ConnectKitProvider >
-          <Component {...pageProps} />
-        </ConnectKitProvider>
+        <Web3ContextProvider>
+          <ConnectKitProvider>
+            <Component {...pageProps} />
+          </ConnectKitProvider>
+        </Web3ContextProvider>
       </WagmiConfig>
     </Provider>
-  )
+  );
 }
