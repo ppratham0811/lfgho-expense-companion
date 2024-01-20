@@ -1,8 +1,7 @@
-
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.20;
 
-import {IPool} from "https://github.com/aave/aave-v3-core/contracts/interfaces/IPool.sol";
+import {IPool} from "@aave/aave-v3-core/contracts/interfaces/IPool.sol";
 import {IERC20} from "@aave/core-v3/contracts/dependencies/openzeppelin/contracts/IERC20.sol";
 import {IPoolAddressesProvider} from "@aave/core-v3/contracts/interfaces/IPoolAddressesProvider.sol";
 import {IERC20} from "@aave/core-v3/contracts/dependencies/openzeppelin/contracts/IERC20.sol";
@@ -11,10 +10,12 @@ import {IERC20} from "@aave/core-v3/contracts/dependencies/openzeppelin/contract
 import {IRouterClient} from "@chainlink/contracts-ccip/src/v0.8/ccip/interfaces/IRouterClient.sol";
 // import {OwnerIsCreator} from "@chainlink/contracts-ccip/src/v0.8/shared/access/OwnerIsCreator.sol";
 import {Client} from "@chainlink/contracts-ccip/src/v0.8/ccip/libraries/Client.sol";
+
 // import {IERC20 as CcipIERC20} from "@chainlink/contracts-ccip/src/v0.8/vendor/openzeppelin-solidity/v4.8.0/contracts/token/ERC20/IERC20.sol";
 
-contract PoolBorrow{
-    IPool public immutable POOL = IPool(0x6Ae43d3271ff6888e7Fc43Fd7321a503ff738951);
+contract PoolBorrow {
+    IPool public immutable POOL =
+        IPool(0x6Ae43d3271ff6888e7Fc43Fd7321a503ff738951);
     address private daiAddress = 0xFF34B3d4Aee8ddCd6F9AFFFB6Fe49bD371b8a357;
     IERC20 private dai = IERC20(daiAddress);
     // address payable owner;
@@ -29,7 +30,7 @@ contract PoolBorrow{
     error NothingToWithdraw(); // Used when trying to withdraw Ether but there's nothing to withdraw.
     error FailedToWithdrawEth(address owner, address target, uint256 value); // Used when the withdrawal of Ether fails.
     error DestinationChainNotAllowlisted(uint64 destinationChainSelector); // Used when the destination chain has not been allowlisted by the contract owner.
-    
+
     // Event emitted when the tokens are transferred to an account on another chain.
     event TokensTransferred(
         bytes32 indexed messageId, // The unique ID of the message.
@@ -55,7 +56,7 @@ contract PoolBorrow{
         s_linkToken = IERC20(_link);
     }
 
-        // Function to check if an address is in the facilitators array
+    // Function to check if an address is in the facilitators array
     function isFacilitator(address _address) public view returns (bool) {
         for (uint i = 0; i < facilitators.length; i++) {
             if (facilitators[i] == _address) {
@@ -65,16 +66,13 @@ contract PoolBorrow{
         return false; // Address is not in the facilitators array
     }
 
-
     function addFacilitator(address _account) public {
-
         // Check if msg.sender is in facilitators array
         require(isFacilitator(msg.sender), "Sender is not a facilitator");
         facilitators.push(_account);
     }
 
     function addMember(address _account) public {
-
         // Check if msg.sender is in facilitators array
         require(isFacilitator(msg.sender), "Sender is not a facilitator");
         members.push(_account);
@@ -93,7 +91,7 @@ contract PoolBorrow{
         // POOL.borrow(0xc4bF5CbDaBE595361438F8c6a187bDc330539c60, amount, 2, 0, 0x3f93B8DCAf29D8B3202347018E23F76e697D8539);
         // Check if msg.sender is in facilitators array
         require(isFacilitator(msg.sender), "Sender is not a facilitator");
-        
+
         POOL.borrow(
             0xc4bF5CbDaBE595361438F8c6a187bDc330539c60,
             amount,
@@ -111,24 +109,19 @@ contract PoolBorrow{
             ghoTokenAddress.balanceOf(address(this)) >= _amount,
             "Insufficient GHO balance"
         );
-        ghoTokenAddress.transfer(
-            msg.sender,
-            _amount
-        );
+        ghoTokenAddress.transfer(msg.sender, _amount);
     }
 
-    function approveDAI(uint256 _amount, address _poolContractAddress)
-        external
-        returns (bool)
-    {
+    function approveDAI(
+        uint256 _amount,
+        address _poolContractAddress
+    ) external returns (bool) {
         return dai.approve(_poolContractAddress, _amount);
     }
 
-    function allowanceDAI(address _poolContractAddress)
-        external
-        view
-        returns (uint256)
-    {
+    function allowanceDAI(
+        address _poolContractAddress
+    ) external view returns (uint256) {
         return dai.allowance(address(this), _poolContractAddress);
     }
 
@@ -143,10 +136,9 @@ contract PoolBorrow{
         return IERC20(_token).balanceOf(address(this));
     }
 
-
     // Chain link functions
 
-        modifier onlyAllowlistedChain(uint64 _destinationChainSelector) {
+    modifier onlyAllowlistedChain(uint64 _destinationChainSelector) {
         if (!allowlistedChains[_destinationChainSelector])
             revert DestinationChainNotAllowlisted(_destinationChainSelector);
         _;
@@ -159,7 +151,7 @@ contract PoolBorrow{
         allowlistedChains[_destinationChainSelector] = allowed;
     }
 
-        function transferTokensPayLINK(
+    function transferTokensPayLINK(
         uint64 _destinationChainSelector,
         address _receiver,
         address _token,
@@ -292,7 +284,6 @@ contract PoolBorrow{
             });
     }
 
-
     function withdraw(address _beneficiary) public {
         uint256 amount = address(this).balance;
         if (amount == 0) revert NothingToWithdraw();
@@ -300,10 +291,7 @@ contract PoolBorrow{
         if (!sent) revert FailedToWithdrawEth(msg.sender, _beneficiary, amount);
     }
 
-    function withdrawToken(
-        address _beneficiary,
-        address _token
-    ) public {
+    function withdrawToken(address _beneficiary, address _token) public {
         // Retrieve the balance of this contract
         uint256 amount = IERC20(_token).balanceOf(address(this));
 
@@ -315,5 +303,3 @@ contract PoolBorrow{
 
     receive() external payable {}
 }
-
- 

@@ -13,7 +13,7 @@ export default function Home() {
       suppressHydrationWarning
     >
       <p className="font-bold text-2xl m-4">
-        Get Started with Metamask Auth (Built with Wagmi)
+        Get Started with Metamask Auth (Built with ConnectKit)
       </p>
       <div className="absolute top-4 right-4">
         <ModeToggle />

@@ -27,6 +27,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 export default function Dashboard() {
   const {isConnected, address} = useAccount();
@@ -35,6 +43,12 @@ export default function Dashboard() {
   const router = useRouter();
   const {chains, switchNetwork} = useSwitchNetwork();
   console.log("chains switch", chain);
+
+  // open all modals
+  const [openStakingModal, setOpenStakingModal] = useState(false);
+  const [openWithdrawModal, setOpenWithdrawModal] = useState(false);
+  const [sendGHOModal, setSendGHOModal] = useState(false);
+
   useEffect(() => {
     if (!isConnected) {
       router.push("/connectwallet");
@@ -64,11 +78,27 @@ export default function Dashboard() {
     <div className="h-screen flex items-center flex-col">
       <div className="absolute top-5 right-10">
         <div className="flex space-x-5 items-center">
-          <Button variant="secondary">Send GHO</Button>
+          <Button
+            variant="secondary"
+            onClick={() => setSendGHOModal((prev) => !prev)}
+          >
+            Send GHO
+          </Button>
           <ConnectKitButton mode={theme.theme} />
           <ModeToggle />
         </div>
       </div>
+
+      <Dialog open={sendGHOModal} onOpenChange={setSendGHOModal}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Send GHO</DialogTitle>
+            <div className="h-[500px] w-[600px]">
+              <DialogDescription></DialogDescription>
+            </div>
+          </DialogHeader>
+        </DialogContent>
+      </Dialog>
 
       <div className="flex w-full items-end justify-between py-10 sm:h-fit sm:justify-start sm:p-10">
         <div className="flex flex-1 flex-col items-center gap-4 sm:flex-row">
@@ -213,7 +243,7 @@ export default function Dashboard() {
       >
         <Card className="h-full w-full rounded-xl row-span-full">
           <CardHeader className="flex flex-row items-center justify-between mt-1">
-            <CardTitle className="">All Appointment</CardTitle>
+            <CardTitle className="">All Members</CardTitle>
             <Button
               className="m-0 w-fit"
               size={"sm"}
@@ -310,8 +340,9 @@ export default function Dashboard() {
 
         <div className="h-full w-full row-start-1 row-end-3">
           <Card className="h-full w-full">
-            <CardHeader className="pb-3">
+            <CardHeader className="flex flex-row items-center justify-between px-4 pt-4 pb-1">
               <CardTitle>Your Supplies</CardTitle>
+              <Button size="sm">Stake</Button>
             </CardHeader>
             <CardContent className="px-3 pt- card-content">
               <Table>
@@ -342,9 +373,22 @@ export default function Dashboard() {
           </Card>
         </div>
         <div className="h-full w-full row-start-1 row-end-3">
+          <Dialog>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Are you absolutely sure?</DialogTitle>
+                <DialogDescription>
+                  This action cannot be undone. This will permanently delete
+                  your account and remove your data from our servers.
+                </DialogDescription>
+              </DialogHeader>
+            </DialogContent>
+          </Dialog>
+
           <Card className="h-full w-full">
-            <CardHeader className="pb-3">
-              <CardTitle>Your Borrowings</CardTitle>
+            <CardHeader className="flex flex-row items-center justify-between px-4 pt-4 pb-1">
+              <CardTitle>Your Supplies</CardTitle>
+              <Button size="sm">Withdraw</Button>
             </CardHeader>
             <CardContent>
               <Table>
