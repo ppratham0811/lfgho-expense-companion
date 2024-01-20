@@ -65,6 +65,10 @@ contract PoolBorrow {
         return allmembers;
     }
 
+    function getAllFacilitators() public view returns (bool[] memory) {
+        return isFacilitators;
+    }
+
     function checkIfFacilitator(address _account) public view returns (bool) {
         for (uint256 i = 0; i < allmembers.length; i++) {
             if (allmembers[i] == _account) {
@@ -91,16 +95,20 @@ contract PoolBorrow {
     function toggleMemberState(address _account) public {
         require(checkIfFacilitator(msg.sender), "Sender is not a facilitator");
 
-        int256 index = -1;
+        uint256 index = 0;
 
         for (uint256 i = 0; i < allmembers.length; i++) {
             if (allmembers[i] == _account) {
-                index = int256(i); // Address found, return the index
+                index = i; // Address found, return the index
             }
         }
 
         require(index >= 0, "address not found");
-        isFacilitators[uint256(index)] = true;
+        if (isFacilitators[index] == true) {
+            isFacilitators[index] = false;
+        } else {
+            isFacilitators[index] = true;
+        }
     }
 
     function sendGHO(address _reciever, uint256 _amount) public {

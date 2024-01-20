@@ -7,7 +7,7 @@ export const Web3Context = createContext();
 
 const Web3ContextProvider = ({ children }) => {
   const [contractAddress, setContractAddress] = useState(
-    "0xA1CECA2C960F310c9AE776A5091999fF2B92D33D"
+    "0xF128920a8cBf98Ae62A94Fc3Bf94e4De82EE7081"
   );
 
   const { write: supplyLiquidity } = useContractWrite({
@@ -36,7 +36,7 @@ const Web3ContextProvider = ({ children }) => {
 
   const DAIaddress = "0xFF34B3d4Aee8ddCd6F9AFFFB6Fe49bD371b8a357";
   const aDAIaddress = "0x29598b72eb5CeBd806C5dCD549490FdA35B13cD8";
-  const GHOaddress = "0xc4bF5CbDaBE595361438F8c6a187bDc330539c60"
+  const GHOaddress = "0xc4bF5CbDaBE595361438F8c6a187bDc330539c60";
 
   const { data: daiBalance } = useContractRead({
     address: contractAddress,
@@ -44,8 +44,6 @@ const Web3ContextProvider = ({ children }) => {
     functionName: "getBalanceOf",
     args: [DAIaddress],
   });
-
-
 
   const { refetch: aDaiBalance } = useContractRead({
     address: contractAddress,
@@ -61,18 +59,16 @@ const Web3ContextProvider = ({ children }) => {
     args: [GHOaddress],
   });
 
-
   const { refetch: getAllMembers } = useContractRead({
     address: contractAddress,
     abi: abi,
     functionName: "getAllMembers",
   });
 
-  const { data: checkIfFacilitator } = useContractRead({
+  const { refetch: getAllFacilitators } = useContractRead({
     address: contractAddress,
     abi: abi,
-    functionName: "isFacilitator",
-    args: ["0x7f0C7aB6bA9bB1B9b7c8e4a4e8b9b8aB8b7b8b7b"],
+    functionName: "getAllFacilitators",
   });
 
   const { write: transferDAI } = useContractWrite({
@@ -81,11 +77,23 @@ const Web3ContextProvider = ({ children }) => {
     functionName: "transfer",
   });
 
-  // supplyLiquidity({ args: [amount] })
-  // borrowGHO({ args: [amount] })
-  // transferGHOToMetamask({ args: [amount] })
+  const { write: addNewMember } = useContractWrite({
+    address: contractAddress,
+    abi: abi,
+    functionName: "addMember",
+  });
 
-  // const contractAddress = "";
+  const { write: addNewFacilitator } = useContractWrite({
+    address: contractAddress,
+    abi: abi,
+    functionName: "addFacilitator",
+  });
+
+  const { write: toggleFacilitator } = useContractWrite({
+    address: contractAddress,
+    abi,
+    functionName: "toggleMemberState",
+  });
 
   return (
     <Web3Context.Provider
@@ -98,8 +106,11 @@ const Web3ContextProvider = ({ children }) => {
         supplyLiquidity,
         aDaiBalance,
         getAllMembers,
-        checkIfFacilitator,
-        GHOBalance
+        getAllFacilitators,
+        GHOBalance,
+        addNewMember,
+        addNewFacilitator,
+        toggleFacilitator,
       }}
     >
       {children}

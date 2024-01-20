@@ -72,8 +72,8 @@ export default function Dashboard() {
   const [aDaiBalance, setaDaiBalance] = useState(0);
   const [GHOBalance, setGHOBalance] = useState(0);
   const [totalStaked, setTotalStaked] = useState(0);
-  const [allMembers, setAllMembers] = useState({});
-  const [facilitatorCount, setFacilitatorCount] = useState([]);
+  const [allMembers, setAllMembers] = useState([]);
+  const [allFacilitatorsCount, setAllFacilitatorsCount] = useState([]);
 
   const {
     contractAddress,
@@ -84,7 +84,10 @@ export default function Dashboard() {
     aDaiBalance: getADAIBalance,
     GHOBalance: getGHOBalance,
     getAllMembers,
-    checkIfFacilitator,
+    getAllFacilitators,
+    addNewMember,
+    addNewFacilitator,
+    toggleFacilitator,
   } = useWeb3Context();
 
   const [addMemberModal, setAddMemberModal] = useState(false);
@@ -108,52 +111,45 @@ export default function Dashboard() {
   }, []);
 
   const fetchMembers = async () => {
-    const members = await getAllMembers();
-    console.log("getAllMembers----", members.data);
-
-    // let allFacilitators = 0;
-    let allMembers = {};
-    for (const mem of members.data) {
-      allMembers[mem] = false;
+    const allMembers = await getAllMembers();
+    const arr = await getAllFacilitators();
+    console.log(allMembers, arr);
+    let temp = {};
+    for (let index = 0; index < allMembers.data.length; index++) {
+      const address = allMembers.data[index];
+      temp[address] = arr.data[index];
     }
-
-    // setFacilitatorCount(allFacilitators);
-    setAllMembers(allMembers);
+    setAllMembers(temp);
+    console.log(temp);
   };
 
-  const fetchFacilitators = async () => {
-    // for( const mem of allMembers){
-    let isFac = checkIfFacilitator;
-    console.log(isFac, "isFac")
-    //   mem.isFac = isFac.data;
-    // }
-  }
+  const getFacilitatorCount = async () => {
+    let count = 0;
+    Object.values(allMembers).map((val) => {
+      if (val) {
+        count++;
+      }
+    });
+    setAllFacilitatorsCount(count);
+  };
+
   useEffect(() => {
+    getFacilitatorCount();
     fetchMembers();
-  }, [])
+  }, []);
 
-
-  // const { refetch: checkIfFacilitator } = useContractRead({
-  //   address: contractAddress,
-  //   abi: abi,
-  //   functionName: "checkIfFacilitator",
-  //   args: [address],
-  // });
-
-
-  useEffect(() => {
-    if (allMembers)
-      fetchFacilitators();
-  }, [allMembers]);
+  function addMemberDashboard({ role, address }) {
+    if (role === "facilitator") {
+      addNewFacilitator({ args: [address] });
+    } else {
+      addNewMember({ args: [address] });
+    }
+  }
 
   useEffect(() => {
     if (!isConnected) {
       router.push("/connectwallet");
     }
-
-    // if (isConnected && chain.id != 80001 && chain.id != 43113) {
-    //   router.push("/switchnetwork");
-    // }
   }, [isConnected, chain, router]);
 
   const Disconnect = async () => {
@@ -329,7 +325,9 @@ export default function Dashboard() {
               </svg>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{totalStaked} DAI</div>
+              <div className="text-2xl font-bold">
+                {Number(daiBalance) / 1e18} DAI
+              </div>
               <p className="text-xs text-muted-foreground"> </p>
             </CardContent>
           </Card>
@@ -354,7 +352,7 @@ export default function Dashboard() {
               </svg>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{facilitatorCount}</div>
+              <div className="text-2xl font-bold">{allFacilitatorsCount}</div>
               <p className="text-xs text-muted-foreground"> </p>
             </CardContent>
           </Card>
@@ -436,7 +434,9 @@ export default function Dashboard() {
               </svg>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{Number(GHOBalance) / 1e18}</div>
+              <div className="text-2xl font-bold">
+                {Number(GHOBalance) / 1e18}
+              </div>
               <p className="text-xs text-muted-foreground"> </p>
             </CardContent>
           </Card>
@@ -480,7 +480,7 @@ export default function Dashboard() {
 
       <div
         className="grid grid-cols-1 gap-4 p-8 xl:grid-cols-3 xl:grid-rows-5 w-full"
-      // style={{gridTemplateColumns: `repeat(auto-fit, minmax(400px, 1fr))`}}
+        // style={{gridTemplateColumns: `repeat(auto-fit, minmax(400px, 1fr))`}}
       >
         <Dialog open={addMemberModal} onOpenChange={setAddMemberModal}>
           <DialogContent>
@@ -489,7 +489,10 @@ export default function Dashboard() {
               <DialogDescription className="h-fit">
                 <Formik
                   initialValues={{ role: "", address: "" }}
-                  onSubmit={(values, _) => console.log(values)}
+                  onSubmit={(values, _) => {
+                    addMemberDashboard(values);
+                    console.log(values);
+                  }}
                 >
                   {(formik) => (
                     <Form className="py-5 flex flex-col space-y-6">
@@ -550,23 +553,28 @@ export default function Dashboard() {
           </CardHeader>
           <CardContent className="m-0 p-0 pb-4">
             <div className="card-scroll px-6 py-2 overflow-y-scroll space-y-8 h-full">
-              {[1, 2, 3, 4, 5].map((item, index) => (
+              {Object.keys(allMembers).map((memberAddress, index) => (
                 <div className="flex items-center justify-between" key={index}>
                   <div className="flex">
                     <Avatar className="h-9 w-9">
                       <AvatarImage src="/avatars/01.png" alt="Avatar" />
-                      <AvatarFallback>OM</AvatarFallback>
+                      <AvatarFallback>{memberAddress}</AvatarFallback>
                     </Avatar>
                     <div className="ml-4 space-y-1">
                       <p className="text-sm font-medium leading-none">
-                        Olivia Martin
+                        {memberAddress}
                       </p>
                       <p className="text-sm text-muted-foreground">
-                        Facilitator
+                        {allMembers[memberAddress] ? "Facilitator" : "Member"}
                       </p>
                     </div>
                   </div>
-                  <Select>
+                  <Select
+                    onValueChange={() =>
+                      toggleFacilitator({ args: [memberAddress] })
+                    }
+                    disabled={address === memberAddress}
+                  >
                     <SelectTrigger className="w-[30%]">
                       <SelectValue placeholder="Select Role" />
                     </SelectTrigger>
@@ -676,7 +684,9 @@ export default function Dashboard() {
                       <p>DAI</p>
                     </TableCell>
                     <TableCell>Collateral</TableCell>
-                    <TableCell className="text-right">$250.00</TableCell>
+                    <TableCell className="text-right">
+                      {Number(daiBalance) / 1e18} DAI
+                    </TableCell>
                   </TableRow>
                 </TableBody>
               </Table>
@@ -741,13 +751,13 @@ export default function Dashboard() {
 
           <Card className="h-full w-full">
             <CardHeader className="flex flex-row items-center justify-between px-4 pt-4 pb-1">
-              <CardTitle>Your Supplies</CardTitle>
+              <CardTitle>GHO Borrowed</CardTitle>
               <Button
                 size="sm"
                 variant="outline"
                 onClick={() => setOpenWithdrawModal((prev) => !prev)}
               >
-                Withdraw
+                Borrow GHO
               </Button>
             </CardHeader>
             <CardContent>

@@ -80,7 +80,6 @@
   width: 0.3em;
 }
 
-
 .card-scroll::-webkit-scrollbar-thumb {
   background-color: rgb(244 114 182);
   border-radius: 999px;
@@ -88,7 +87,6 @@
 
 .animate-button:hover {
   animation: spin 0.5s linear 1;
-
 }
 
 @keyframes spin {
@@ -97,8 +95,8 @@
   }
 }
 
-input[type=number]::-webkit-inner-spin-button,
-input[type=number]::-webkit-outer-spin-button {
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
