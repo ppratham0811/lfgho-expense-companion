@@ -1,7 +1,7 @@
-import { ModeToggle } from "@/components/Toggletheme";
-import { Button } from "@/components/ui/button";
-import { useRouter } from "next/navigation";
-import { useContext, useEffect, useState } from "react";
+import {ModeToggle} from "@/components/Toggletheme";
+import {Button} from "@/components/ui/button";
+import {useRouter} from "next/navigation";
+import {useContext, useEffect, useState} from "react";
 import {
   Table,
   TableBody,
@@ -12,14 +12,14 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-import { useAccount, useNetwork, useSwitchNetwork } from "wagmi";
-import { disconnect } from "@wagmi/core";
+import {useAccount, useNetwork, useSwitchNetwork} from "wagmi";
+import {disconnect} from "@wagmi/core";
 
-import { toast } from "@/components/ui/use-toast";
-import { ConnectKitButton } from "connectkit";
-import { useTheme } from "next-themes";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {toast} from "@/components/ui/use-toast";
+import {ConnectKitButton} from "connectkit";
+import {useTheme} from "next-themes";
+import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
+import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {
   Select,
   SelectContent,
@@ -37,9 +37,9 @@ import {
 } from "@/components/ui/dialog";
 import useWeb3Context from "../hooks/useWeb3Context";
 
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { ErrorMessage, Field, Form, Formik } from "formik";
+import {Label} from "@/components/ui/label";
+import {Input} from "@/components/ui/input";
+import {ErrorMessage, Field, Form, Formik} from "formik";
 import * as Yup from "yup";
 import {
   Tooltip,
@@ -55,14 +55,14 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Menu } from "lucide-react";
+import {Menu} from "lucide-react";
 
 export default function Dashboard() {
-  const { isConnected, address } = useAccount();
-  const { chain } = useNetwork();
+  const {isConnected, address} = useAccount();
+  const {chain} = useNetwork();
   const [mounted, setMounted] = useState(false);
   const router = useRouter();
-  const { chains, switchNetwork } = useSwitchNetwork();
+  const {chains, switchNetwork} = useSwitchNetwork();
 
   // open all modals
   const [openStakingModal, setOpenStakingModal] = useState(false);
@@ -138,11 +138,11 @@ export default function Dashboard() {
     fetchMembers();
   }, []);
 
-  function addMemberDashboard({ role, address }) {
+  function addMemberDashboard({role, address}) {
     if (role === "facilitator") {
-      addNewFacilitator({ args: [address] });
+      addNewFacilitator({args: [address]});
     } else {
-      addNewMember({ args: [address] });
+      addNewMember({args: [address]});
     }
   }
 
@@ -182,7 +182,7 @@ export default function Dashboard() {
             <DialogTitle>Fund your Contract with DAI</DialogTitle>
             <DialogDescription className="h-fit">
               <Formik
-                initialValues={{ amount: "" }}
+                initialValues={{amount: ""}}
                 onSubmit={(values) => {
                   console.log(values.amount * 1e18);
                   transferDAI({
@@ -468,7 +468,7 @@ export default function Dashboard() {
                 size="sm"
                 onClick={() => {
                   console.log(daiBalance);
-                  approveDAI({ args: [daiBalance, contractAddress] });
+                  approveDAI({args: [daiBalance, contractAddress]});
                 }}
               >
                 Approve DAI
@@ -488,7 +488,7 @@ export default function Dashboard() {
               <DialogTitle>Add New Member</DialogTitle>
               <DialogDescription className="h-fit">
                 <Formik
-                  initialValues={{ role: "", address: "" }}
+                  initialValues={{role: "", address: ""}}
                   onSubmit={(values, _) => {
                     addMemberDashboard(values);
                     console.log(values);
@@ -558,11 +558,15 @@ export default function Dashboard() {
                   <div className="flex">
                     <Avatar className="h-9 w-9">
                       <AvatarImage src="/avatars/01.png" alt="Avatar" />
-                      <AvatarFallback>{memberAddress}</AvatarFallback>
+                      <AvatarFallback>
+                        {memberAddress.slice(2, 4)}
+                      </AvatarFallback>
                     </Avatar>
-                    <div className="ml-4 space-y-1">
+                    <div className="ml-4 space-y-1 w-[100px]">
                       <p className="text-sm font-medium leading-none">
-                        {memberAddress}
+                        {memberAddress.slice(0, 8) +
+                          "..." +
+                          memberAddress.slice(-8)}
                       </p>
                       <p className="text-sm text-muted-foreground">
                         {allMembers[memberAddress] ? "Facilitator" : "Member"}
@@ -571,7 +575,7 @@ export default function Dashboard() {
                   </div>
                   <Select
                     onValueChange={() =>
-                      toggleFacilitator({ args: [memberAddress] })
+                      toggleFacilitator({args: [memberAddress]})
                     }
                     disabled={address === memberAddress}
                   >
@@ -579,8 +583,18 @@ export default function Dashboard() {
                       <SelectValue placeholder="Select Role" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="facilitator">Facilitator</SelectItem>
-                      <SelectItem value="normal">Normal</SelectItem>
+                      <SelectItem
+                        value="facilitator"
+                        disabled={allMembers[memberAddress]}
+                      >
+                        Facilitator
+                      </SelectItem>
+                      <SelectItem
+                        value="member"
+                        disabled={!allMembers[memberAddress]}
+                      >
+                        Member
+                      </SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -597,7 +611,7 @@ export default function Dashboard() {
                 <DialogDescription className="h-fit">
                   <div>
                     <Formik
-                      initialValues={{ amount: "" }}
+                      initialValues={{amount: ""}}
                       onSubmit={(values) => {
                         console.log(values.amount * 1e18);
                         supplyLiquidity({
@@ -700,7 +714,7 @@ export default function Dashboard() {
                 <DialogTitle>Withdraw</DialogTitle>
                 <DialogDescription>
                   <Formik
-                    initialValues={{ amount: "" }}
+                    initialValues={{amount: ""}}
                     onSubmit={(values) => console.log(values)}
                   >
                     {(formik) => (

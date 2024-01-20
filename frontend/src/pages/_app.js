@@ -12,7 +12,7 @@ export default function App({ Component, pageProps }) {
       appName: "LFGHO hackathon",
       //infuraId: process.env.NEXT_PUBLIC_INFURA_ID,
       alchemyId: process.env.NEXT_PUBLIC_ALCHEMY_ID,
-      chains: [arbitrumSepolia, sepolia],
+      chains: [sepolia],
       autoConnect: true,
       walletConnectProjectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID,
     })
