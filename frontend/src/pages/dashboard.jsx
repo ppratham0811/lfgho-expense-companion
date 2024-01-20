@@ -1,7 +1,7 @@
-import {ModeToggle} from "@/components/Toggletheme";
-import {Button} from "@/components/ui/button";
-import {useRouter} from "next/navigation";
-import {useEffect, useState} from "react";
+import { ModeToggle } from "@/components/Toggletheme";
+import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import {
   Table,
   TableBody,
@@ -12,14 +12,14 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-import {useAccount, useNetwork, useSwitchNetwork} from "wagmi";
-import {disconnect} from "@wagmi/core";
+import { useAccount, useNetwork, useSwitchNetwork } from "wagmi";
+import { disconnect } from "@wagmi/core";
 
-import {toast} from "@/components/ui/use-toast";
-import {ConnectKitButton} from "connectkit";
-import {useTheme} from "next-themes";
-import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
-import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
+import { toast } from "@/components/ui/use-toast";
+import { ConnectKitButton } from "connectkit";
+import { useTheme } from "next-themes";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Select,
   SelectContent,
@@ -35,24 +35,24 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import {Label} from "@/components/ui/label";
-import {Input} from "@/components/ui/input";
-import {Form, Formik} from "formik";
-import * as Yup from "yup";
 
 export default function Dashboard() {
-  const {isConnected, address} = useAccount();
-  const {chain} = useNetwork();
+  const { isConnected, address } = useAccount();
+  const { chain } = useNetwork();
   const [mounted, setMounted] = useState(false);
   const router = useRouter();
-  const {chains, switchNetwork} = useSwitchNetwork();
+  const { chains, switchNetwork } = useSwitchNetwork();
   console.log("chains switch", chain);
 
   // open all modals
   const [openStakingModal, setOpenStakingModal] = useState(false);
   const [openWithdrawModal, setOpenWithdrawModal] = useState(false);
   const [sendGHOModal, setSendGHOModal] = useState(false);
-  const [addMemberModal, setAddMemberModal] = useState(false);
+
+
+
+
+
 
   useEffect(() => {
     if (!isConnected) {
@@ -79,6 +79,24 @@ export default function Dashboard() {
 
   useEffect(() => setMounted(true), []);
   if (!mounted) return null;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   return (
     <div className="h-screen flex items-center flex-col">
       <div className="absolute top-5 right-10">
@@ -98,41 +116,9 @@ export default function Dashboard() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Send GHO</DialogTitle>
-            <DialogDescription>
-              <div className="h-[500px] flex">
-                <div className="w-full p-4 flex flex-col space-y-3">
-                  <Label htmlFor="email" className="ml-1">
-                    Amount
-                  </Label>
-                  <div className="w-full border-[1px] border-slate-200 h-16 rounded-lg flex flex-col">
-                    <div className="flex h-[60%]">
-                      <Input
-                        type="number"
-                        id="amount"
-                        placeholder="0.00"
-                        className="flex-1 appearance-none focus-visible:ring-0 shadow-none border-none outline-none text-lg"
-                      />
-
-                      <div className="flex gap-2 items-center pr-4">
-                        <img
-                          src="/gho.svg"
-                          alt="gho"
-                          className="h-5 aspect-square"
-                        />
-                        <p>GHO</p>
-                      </div>
-                    </div>
-                    <div className="ml-3 text-xs flex justify-between mr-3">
-                      <div>$34</div>
-                      <div className="flex text-xs gap-1">
-                        <div>GHO Balance: 2</div>
-                        <p className="font-bold">MAX</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </DialogDescription>
+            <div className="h-[500px] w-[600px]">
+              <DialogDescription></DialogDescription>
+            </div>
           </DialogHeader>
         </DialogContent>
       </Dialog>
@@ -276,57 +262,15 @@ export default function Dashboard() {
 
       <div
         className="grid h-screen grid-flow-row grid-cols-1 gap-4 p-8 xl:grid-cols-3 xl:grid-rows-5 w-full"
-        // style={{gridTemplateColumns: `repeat(auto-fit, minmax(400px, 1fr))`}}
+      // style={{gridTemplateColumns: `repeat(auto-fit, minmax(400px, 1fr))`}}
       >
-        <Dialog open={addMemberModal} onOpenChange={setAddMemberModal}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Add New Member</DialogTitle>
-              <DialogDescription className="h-fit">
-                <Formik initialValues={{}} onSubmit={() => {}}>
-                  {(formik) => (
-                    <Form className="py-5 flex flex-col space-y-6">
-                      <div className="flex">
-                        <Label htmlFor="address" className="w-[100px] my-auto">
-                          Address:{" "}
-                        </Label>
-                        <Input
-                          type="text"
-                          id="address"
-                          placeholder="0x3r34...."
-                          className="flex-1"
-                        />
-                      </div>
-                      <div className="flex">
-                        <Label htmlFor="role" className="w-[100px] my-auto">
-                          Role:{" "}
-                        </Label>
-                        <Select>
-                          <SelectTrigger className="flex-1">
-                            <SelectValue placeholder="Theme" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="light">Light</SelectItem>
-                            <SelectItem value="dark">Dark</SelectItem>
-                            <SelectItem value="system">System</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <Button>Submit</Button>
-                    </Form>
-                  )}
-                </Formik>
-              </DialogDescription>
-            </DialogHeader>
-          </DialogContent>
-        </Dialog>
         <Card className="h-full w-full rounded-xl row-span-full">
           <CardHeader className="flex flex-row items-center justify-between mt-1">
             <CardTitle className="">All Members</CardTitle>
             <Button
               className="m-0 w-fit"
               size={"sm"}
-              onClick={() => setAddMemberModal((prev) => !prev)}
+            // onClick={() => setOpenNewAppointment((prev) => !prev)}
             >
               Add New Member
             </Button>
