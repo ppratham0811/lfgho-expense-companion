@@ -56,6 +56,10 @@ contract PoolBorrow {
         s_linkToken = IERC20(0x779877A7B0D9E8603169DdbD7836e478b4624789);
     }
 
+    function getPool() public view returns (address) {
+        return address(POOL);
+    }
+
     function getAllMembers() public view returns (address[] memory) {
         return allmembers;
     }

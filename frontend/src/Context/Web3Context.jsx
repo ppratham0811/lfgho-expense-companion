@@ -7,7 +7,7 @@ export const Web3Context = createContext();
 
 const Web3ContextProvider = ({ children }) => {
   const [contractAddress, setContractAddress] = useState(
-    "0xd49A69020D7DDA345aC0df4713193CfDB0b731D9"
+    "0x01dcbb95BEDBDd1683E55e7c81439869f9EBA9C5"
   );
 
   const { write: supplyLiquidity } = useContractWrite({
@@ -36,6 +36,7 @@ const Web3ContextProvider = ({ children }) => {
 
   const DAIaddress = "0xFF34B3d4Aee8ddCd6F9AFFFB6Fe49bD371b8a357";
   const aDAIaddress = "0x29598b72eb5CeBd806C5dCD549490FdA35B13cD8";
+  const GHOaddress = "0xc4bF5CbDaBE595361438F8c6a187bDc330539c60"
 
   const { data: daiBalance } = useContractRead({
     address: contractAddress,
@@ -44,12 +45,22 @@ const Web3ContextProvider = ({ children }) => {
     args: [DAIaddress],
   });
 
+
+
   const { refetch: aDaiBalance } = useContractRead({
     address: contractAddress,
     abi: abi,
     functionName: "getBalanceOf",
     args: [aDAIaddress],
   });
+
+  const { refetch: GHOBalance } = useContractRead({
+    address: contractAddress,
+    abi: abi,
+    functionName: "getBalanceOf",
+    args: [GHOaddress],
+  });
+
 
   const { refetch: getAllMembers } = useContractRead({
     address: contractAddress,
@@ -87,6 +98,7 @@ const Web3ContextProvider = ({ children }) => {
         aDaiBalance,
         getAllMembers,
         checkIfFacilitator,
+        GHOBalance
       }}
     >
       {children}

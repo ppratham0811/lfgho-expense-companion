@@ -55,6 +55,7 @@ export default function Dashboard() {
   const [sendGHOModal, setSendGHOModal] = useState(false);
 
   const [aDaiBalance, setaDaiBalance] = useState(0);
+  const [GHOBalance, setGHOBalance] = useState(0);
   const [totalStaked, setTotalStaked] = useState(0);
   const [allMembers, setAllMembers] = useState([]);
   const [facilitatorCount, setFacilitatorCount] = useState([]);
@@ -66,6 +67,7 @@ export default function Dashboard() {
     daiBalance,
     supplyLiquidity,
     aDaiBalance: getADAIBalance,
+    GHOBalance: getGHOBalance,
     getAllMembers,
     checkIfFacilitator,
   } = useWeb3Context();
@@ -81,6 +83,15 @@ export default function Dashboard() {
       console.log("adai balance: ", balance);
     })();
   }, []);
+
+  useEffect(() => {
+    (async function () {
+      let balance = await getGHOBalance();
+      setGHOBalance(balance.data);
+      console.log("GHO balance: ", balance);
+    })();
+  }, []);
+
   const fetchMembers = async () => {
     const members = await getAllMembers();
     console.log("getAllMembers----", members.data);
@@ -356,7 +367,7 @@ export default function Dashboard() {
               </svg>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">200 GHO</div>
+              <div className="text-2xl font-bold">{Number(GHOBalance) / 1e18}</div>
               <p className="text-xs text-muted-foreground"> </p>
             </CardContent>
           </Card>
@@ -399,7 +410,7 @@ export default function Dashboard() {
 
       <div
         className="grid h-screen grid-flow-row grid-cols-1 gap-4 p-8 xl:grid-cols-3 xl:grid-rows-5 w-full"
-        // style={{gridTemplateColumns: `repeat(auto-fit, minmax(400px, 1fr))`}}
+      // style={{gridTemplateColumns: `repeat(auto-fit, minmax(400px, 1fr))`}}
       >
         <Dialog open={addMemberModal} onOpenChange={setAddMemberModal}>
           <DialogContent>
