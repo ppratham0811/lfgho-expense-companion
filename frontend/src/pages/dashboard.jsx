@@ -57,7 +57,7 @@ export default function Dashboard() {
   const [aDaiBalance, setaDaiBalance] = useState(0);
   const [GHOBalance, setGHOBalance] = useState(0);
   const [totalStaked, setTotalStaked] = useState(0);
-  const [allMembers, setAllMembers] = useState([]);
+  const [allMembers, setAllMembers] = useState({});
   const [facilitatorCount, setFacilitatorCount] = useState([]);
 
   const {
@@ -95,26 +95,41 @@ export default function Dashboard() {
   const fetchMembers = async () => {
     const members = await getAllMembers();
     console.log("getAllMembers----", members.data);
-    let allFacilitators = 0;
-    let allMembers = [];
+
+    // let allFacilitators = 0;
+    let allMembers = {};
     for (const mem of members.data) {
-      const result = await checkIfFacilitator({
-        args: [mem],
-      });
-      console.log(result, "result");
-      if (result.data) {
-        allFacilitators += 1;
-      }
-      allMembers.push({ mem, isFac: result.data });
+      allMembers[mem] = false;
     }
 
-    // console.log(allFacilitators, allMembers);
-    setFacilitatorCount(allFacilitators);
+    // setFacilitatorCount(allFacilitators);
     setAllMembers(allMembers);
   };
+
+  const fetchFacilitators = async () => {
+    // for( const mem of allMembers){
+    let isFac = checkIfFacilitator;
+    console.log(isFac, "isFac")
+    //   mem.isFac = isFac.data;
+    // }
+  }
   useEffect(() => {
     fetchMembers();
-  }, []);
+  }, [])
+
+
+  // const { refetch: checkIfFacilitator } = useContractRead({
+  //   address: contractAddress,
+  //   abi: abi,
+  //   functionName: "checkIfFacilitator",
+  //   args: [address],
+  // });
+
+
+  useEffect(() => {
+    if (allMembers)
+      fetchFacilitators();
+  }, [allMembers]);
 
   useEffect(() => {
     if (!isConnected) {

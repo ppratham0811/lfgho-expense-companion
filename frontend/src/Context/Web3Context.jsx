@@ -7,7 +7,7 @@ export const Web3Context = createContext();
 
 const Web3ContextProvider = ({ children }) => {
   const [contractAddress, setContractAddress] = useState(
-    "0x01dcbb95BEDBDd1683E55e7c81439869f9EBA9C5"
+    "0xA1CECA2C960F310c9AE776A5091999fF2B92D33D"
   );
 
   const { write: supplyLiquidity } = useContractWrite({
@@ -68,10 +68,11 @@ const Web3ContextProvider = ({ children }) => {
     functionName: "getAllMembers",
   });
 
-  const { refetch: checkIfFacilitator } = useContractRead({
+  const { data: checkIfFacilitator } = useContractRead({
     address: contractAddress,
     abi: abi,
-    functionName: "checkIfFacilitator",
+    functionName: "isFacilitator",
+    args: ["0x7f0C7aB6bA9bB1B9b7c8e4a4e8b9b8aB8b7b8b7b"],
   });
 
   const { write: transferDAI } = useContractWrite({

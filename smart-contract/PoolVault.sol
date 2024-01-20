@@ -22,7 +22,7 @@ contract PoolBorrow {
 
     // new functions
     // address[] facilitators;
-    mapping(address => bool) public isFacilitator;
+    bool[] isFacilitators;
     address[] allmembers;
 
     // chain error and events
@@ -50,7 +50,8 @@ contract PoolBorrow {
     constructor() {
         // owner = payable(msg.sender);
         // facilitators.push(msg.sender); // added owner as facilator
-        isFacilitator[msg.sender] = true;
+        // isFacilitator[msg.sender] = true;
+        isFacilitators.push(true);
         allmembers.push(msg.sender);
         s_router = IRouterClient(0x0BF3dE8c5D3e8A2B34D2BEeB17ABfCeBaf363A59);
         s_linkToken = IERC20(0x779877A7B0D9E8603169DdbD7836e478b4624789);
@@ -65,21 +66,41 @@ contract PoolBorrow {
     }
 
     function checkIfFacilitator(address _account) public view returns (bool) {
-        return isFacilitator[_account];
+        for (uint256 i = 0; i < allmembers.length; i++) {
+            if (allmembers[i] == _account) {
+                return true; // Address found, return the index
+            }
+        }
+        return false;
     }
 
     function addFacilitator(address _account) public {
         // Check if msg.sender is in facilitators array
-        require(isFacilitator[msg.sender], "Sender is not a facilitator");
-        isFacilitator[_account] = true;
+        require(checkIfFacilitator(msg.sender), "Sender is not a facilitator");
         allmembers.push(_account);
+        isFacilitators.push(true);
     }
 
     function addMember(address _account) public {
         // Check if msg.sender is in facilitators array
-        require(isFacilitator[msg.sender], "Sender is not a facilitator");
-        isFacilitator[_account] = false;
+        require(checkIfFacilitator(msg.sender), "Sender is not a facilitator");
         allmembers.push(_account);
+        isFacilitators.push(false);
+    }
+
+    function toggleMemberState(address _account) public {
+        require(checkIfFacilitator(msg.sender), "Sender is not a facilitator");
+
+        int256 index = -1;
+
+        for (uint256 i = 0; i < allmembers.length; i++) {
+            if (allmembers[i] == _account) {
+                index = int256(i); // Address found, return the index
+            }
+        }
+
+        require(index >= 0, "address not found");
+        isFacilitators[uint256(index)] = true;
     }
 
     function sendGHO(address _reciever, uint256 _amount) public {
@@ -105,7 +126,7 @@ contract PoolBorrow {
     function borrowGHO(uint256 amount) public {
         // POOL.borrow(0xc4bF5CbDaBE595361438F8c6a187bDc330539c60, amount, 2, 0, 0x3f93B8DCAf29D8B3202347018E23F76e697D8539);
         // Check if msg.sender is in facilitators array
-        require(isFacilitator[msg.sender], "Sender is not a facilitator");
+        require(checkIfFacilitator(msg.sender), "Sender is not a facilitator");
 
         POOL.borrow(
             0xc4bF5CbDaBE595361438F8c6a187bDc330539c60,
