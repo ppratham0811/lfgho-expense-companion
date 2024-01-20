@@ -1,7 +1,7 @@
-import {ModeToggle} from "@/components/Toggletheme";
-import {Button} from "@/components/ui/button";
-import {useRouter} from "next/navigation";
-import {useEffect, useState} from "react";
+import { ModeToggle } from "@/components/Toggletheme";
+import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import {
   Table,
   TableBody,
@@ -12,14 +12,14 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-import {useAccount, useNetwork, useSwitchNetwork} from "wagmi";
-import {disconnect} from "@wagmi/core";
+import { useAccount, useNetwork, useSwitchNetwork } from "wagmi";
+import { disconnect } from "@wagmi/core";
 
-import {toast} from "@/components/ui/use-toast";
-import {ConnectKitButton} from "connectkit";
-import {useTheme} from "next-themes";
-import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
-import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
+import { toast } from "@/components/ui/use-toast";
+import { ConnectKitButton } from "connectkit";
+import { useTheme } from "next-themes";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Select,
   SelectContent,
@@ -35,17 +35,17 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import {Label} from "@/components/ui/label";
-import {Input} from "@/components/ui/input";
-import {Form, Formik} from "formik";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Form, Formik } from "formik";
 import * as Yup from "yup";
 
 export default function Dashboard() {
-  const {isConnected, address} = useAccount();
-  const {chain} = useNetwork();
+  const { isConnected, address } = useAccount();
+  const { chain } = useNetwork();
   const [mounted, setMounted] = useState(false);
   const router = useRouter();
-  const {chains, switchNetwork} = useSwitchNetwork();
+  const { chains, switchNetwork } = useSwitchNetwork();
   console.log("chains switch", chain);
 
   // open all modals
@@ -303,12 +303,13 @@ export default function Dashboard() {
                         </Label>
                         <Select>
                           <SelectTrigger className="flex-1">
-                            <SelectValue placeholder="Theme" />
+                            <SelectValue placeholder="Select Role" />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="light">Light</SelectItem>
-                            <SelectItem value="dark">Dark</SelectItem>
-                            <SelectItem value="system">System</SelectItem>
+                            <SelectItem value="facilitator">
+                              Facilitator
+                            </SelectItem>
+                            <SelectItem value="member">Member</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
