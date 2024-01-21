@@ -1,5 +1,6 @@
 import { createContext, useState } from "react";
 import DAIabi from "../constant/DAI-abi.json";
+import GHOabi from "../constant/GHO-abi.json";
 import { ABI as abi } from "@/constant/abi";
 import { useContractWrite, useContractRead } from "wagmi";
 import { useToast } from "@/components/ui/use-toast";
@@ -121,6 +122,12 @@ const Web3ContextProvider = ({ children }) => {
   } = useContractWrite({
     address: DAIaddress,
     abi: DAIabi,
+    functionName: "transfer",
+  });
+
+  const { write: transferGHO } = useContractWrite({
+    address: GHOaddress,
+    abi: GHOabi,
     functionName: "transfer",
   });
 
@@ -313,6 +320,7 @@ const Web3ContextProvider = ({ children }) => {
         loading12,
         approveDAIisSuccess,
         crossChainHash,
+        transferGHO,
       }}
     >
       {children}
