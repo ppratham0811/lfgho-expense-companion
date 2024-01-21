@@ -163,12 +163,12 @@ contract PoolBorrow {
         transactions.push(newTransaction);
     }
 
-    function borrowGHO(uint256 amount) public {
+    function borrowGHO(uint256 amount, uint256 interestRateMode) public {
         // POOL.borrow(0xc4bF5CbDaBE595361438F8c6a187bDc330539c60, amount, 2, 0, 0x3f93B8DCAf29D8B3202347018E23F76e697D8539);
         // Check if msg.sender is in facilitators array
         require(checkIfFacilitator(msg.sender), "Sender is not a facilitator");
 
-        POOL.borrow(GhoAddress, amount, 2, 0, address(this));
+        POOL.borrow(GhoAddress, amount, interestRateMode, 0, address(this));
 
         borrowAmt += amount;
 
