@@ -1,17 +1,17 @@
-import {createContext, useState} from "react";
+import { createContext, useState } from "react";
 import DAIabi from "../constant/DAI-abi.json";
-import {ABI as abi} from "@/constant/abi";
-import {useContractWrite, useContractRead} from "wagmi";
-import {useToast} from "@/components/ui/use-toast";
+import { ABI as abi } from "@/constant/abi";
+import { useContractWrite, useContractRead } from "wagmi";
+import { useToast } from "@/components/ui/use-toast";
 
 export const Web3Context = createContext();
 
-const Web3ContextProvider = ({children}) => {
+const Web3ContextProvider = ({ children }) => {
   // toast
   const toast = useToast();
 
   const [contractAddress, setContractAddress] = useState(
-    "0xF128920a8cBf98Ae62A94Fc3Bf94e4De82EE7081"
+    "0x1152B04B6f5E8BA27192425b0313D07D1127E369"
   );
 
   const DAIaddress = "0xFF34B3d4Aee8ddCd6F9AFFFB6Fe49bD371b8a357";
@@ -20,7 +20,7 @@ const Web3ContextProvider = ({children}) => {
 
   // contract read
 
-  const {data: daiBalance} = useContractRead({
+  const { data: daiBalance } = useContractRead({
     address: contractAddress,
     abi: abi,
     functionName: "getBalanceOf",

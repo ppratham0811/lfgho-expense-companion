@@ -47,10 +47,19 @@ contract PoolBorrow {
     IRouterClient private s_router;
     IERC20 private s_linkToken;
 
+    struct Transaction {
+        address from;
+        string transactionType;
+        address interactedWith;
+        uint256 amount;
+        uint256 timestamp;
+    }
+
+    Transaction[] public transactions;
+    uint256 suppliedAmt = 0;
+    uint256 borrowAmt = 0;
+
     constructor() {
-        // owner = payable(msg.sender);
-        // facilitators.push(msg.sender); // added owner as facilator
-        // isFacilitator[msg.sender] = true;
         isFacilitators.push(true);
         allmembers.push(msg.sender);
         s_router = IRouterClient(0x0BF3dE8c5D3e8A2B34D2BEeB17ABfCeBaf363A59);
@@ -67,6 +76,18 @@ contract PoolBorrow {
 
     function getAllFacilitators() public view returns (bool[] memory) {
         return isFacilitators;
+    }
+
+    function getsuppliedAmt() public view returns (uint256) {
+        return suppliedAmt;
+    }
+
+    function getBorrowAmt() public view returns (uint256) {
+        return borrowAmt;
+    }
+
+    function getAllTransactions() public view returns (Transaction[] memory) {
+        return transactions;
     }
 
     function checkIfFacilitator(address _account) public view returns (bool) {
@@ -129,6 +150,18 @@ contract PoolBorrow {
         uint16 referralCode = 0;
 
         POOL.supply(asset, amount, onBehalfOf, referralCode);
+
+        suppliedAmt += amount;
+
+        Transaction memory newTransaction = Transaction({
+            from: msg.sender,
+            transactionType: "stake",
+            interactedWith: address(POOL),
+            amount: _amount,
+            timestamp: block.timestamp
+        });
+
+        transactions.push(newTransaction);
     }
 
     function borrowGHO(uint256 amount) public {
@@ -143,6 +176,18 @@ contract PoolBorrow {
             0,
             address(this)
         );
+
+        borrowAmt += amount;
+
+        Transaction memory newTransaction = Transaction({
+            from: msg.sender,
+            transactionType: "borrow",
+            interactedWith: address(POOL),
+            amount: amount,
+            timestamp: block.timestamp
+        });
+
+        transactions.push(newTransaction);
     }
 
     function transferToMetamask(uint256 _amount) public {
@@ -154,6 +199,35 @@ contract PoolBorrow {
             "Insufficient GHO balance"
         );
         ghoTokenAddress.transfer(msg.sender, _amount);
+
+        Transaction memory newTransaction = Transaction({
+            from: msg.sender,
+            transactionType: "transfer GHO to self",
+            interactedWith: address(this),
+            amount: _amount,
+            timestamp: block.timestamp
+        });
+        transactions.push(newTransaction);
+    }
+
+    function transferToUser(address _reciever, uint256 _amount) public {
+        IERC20 ghoTokenAddress = IERC20(
+            0xc4bF5CbDaBE595361438F8c6a187bDc330539c60
+        );
+        require(
+            ghoTokenAddress.balanceOf(address(this)) >= _amount,
+            "Insufficient GHO balance"
+        );
+        ghoTokenAddress.transfer(_reciever, _amount);
+
+        Transaction memory newTransaction = Transaction({
+            from: msg.sender,
+            transactionType: "transfer GHO to self",
+            interactedWith: _reciever,
+            amount: _amount,
+            timestamp: block.timestamp
+        });
+        transactions.push(newTransaction);
     }
 
     function approveDAI(
@@ -246,56 +320,15 @@ contract PoolBorrow {
             fees
         );
 
-        // Return the message ID
-        return messageId;
-    }
+        Transaction memory newTransaction = Transaction({
+            from: msg.sender,
+            transactionType: "transfer GHO crosschain",
+            interactedWith: _receiver,
+            amount: _amount,
+            timestamp: block.timestamp
+        });
 
-    function transferTokensPayNative(
-        uint64 _destinationChainSelector,
-        address _receiver,
-        address _token,
-        uint256 _amount
-    )
-        external
-        onlyAllowlistedChain(_destinationChainSelector)
-        returns (bytes32 messageId)
-    {
-        // Create an EVM2AnyMessage struct in memory with necessary information for sending a cross-chain message
-        // address(0) means fees are paid in native gas
-        Client.EVM2AnyMessage memory evm2AnyMessage = _buildCCIPMessage(
-            _receiver,
-            _token,
-            _amount,
-            address(0)
-        );
-
-        // Get the fee required to send the message
-        uint256 fees = s_router.getFee(
-            _destinationChainSelector,
-            evm2AnyMessage
-        );
-
-        if (fees > address(this).balance)
-            revert NotEnoughBalance(address(this).balance, fees);
-
-        // approve the Router to spend tokens on contract's behalf. It will spend the amount of the given token
-        IERC20(_token).approve(address(s_router), _amount);
-
-        messageId = s_router.ccipSend{value: fees}(
-            _destinationChainSelector,
-            evm2AnyMessage
-        );
-
-        // Emit an event with message details
-        emit TokensTransferred(
-            messageId,
-            _destinationChainSelector,
-            _receiver,
-            _token,
-            _amount,
-            address(0),
-            fees
-        );
+        transactions.push(newTransaction);
 
         // Return the message ID
         return messageId;
