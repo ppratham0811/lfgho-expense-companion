@@ -1,7 +1,7 @@
-import {ModeToggle} from "@/components/Toggletheme";
-import {Button} from "@/components/ui/button";
-import {useRouter} from "next/navigation";
-import {useContext, useEffect, useState} from "react";
+import { ModeToggle } from "@/components/Toggletheme";
+import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
+import { useContext, useEffect, useState } from "react";
 import {
   Table,
   TableBody,
@@ -11,13 +11,13 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {useAccount, useNetwork, useSwitchNetwork} from "wagmi";
-import {disconnect} from "@wagmi/core";
-import {toast} from "@/components/ui/use-toast";
-import {ConnectKitButton} from "connectkit";
-import {useTheme} from "next-themes";
-import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
-import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
+import { useAccount, useNetwork, useSwitchNetwork } from "wagmi";
+import { disconnect } from "@wagmi/core";
+import { toast } from "@/components/ui/use-toast";
+import { ConnectKitButton } from "connectkit";
+import { useTheme } from "next-themes";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Select,
   SelectContent,
@@ -34,9 +34,9 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import useWeb3Context from "../hooks/useWeb3Context";
-import {Label} from "@/components/ui/label";
-import {Input} from "@/components/ui/input";
-import {ErrorMessage, Field, Form, Formik} from "formik";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { ErrorMessage, Field, Form, Formik } from "formik";
 import * as Yup from "yup";
 import {
   Tooltip,
@@ -52,15 +52,15 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {Menu} from "lucide-react";
-import {ReloadIcon} from "@radix-ui/react-icons";
+import { Menu } from "lucide-react";
+import { ReloadIcon } from "@radix-ui/react-icons";
 
 export default function Dashboard() {
-  const {isConnected, address} = useAccount();
-  const {chain} = useNetwork();
+  const { isConnected, address } = useAccount();
+  const { chain } = useNetwork();
   const [mounted, setMounted] = useState(false);
   const router = useRouter();
-  const {chains, switchNetwork} = useSwitchNetwork();
+  const { chains, switchNetwork } = useSwitchNetwork();
 
   // open all modals
   const [openStakingModal, setOpenStakingModal] = useState(false);
@@ -165,11 +165,11 @@ export default function Dashboard() {
     fetchMembers();
   }, []);
 
-  function addMemberDashboard({role, address}) {
+  function addMemberDashboard({ role, address }) {
     if (role === "facilitator") {
-      addNewFacilitator({args: [address]});
+      addNewFacilitator({ args: [address] });
     } else {
-      addNewMember({args: [address]});
+      addNewMember({ args: [address] });
     }
   }
 
@@ -220,7 +220,7 @@ export default function Dashboard() {
             <DialogTitle>Fund your Contract with DAI</DialogTitle>
             <DialogDescription className="h-fit">
               <Formik
-                initialValues={{amount: ""}}
+                initialValues={{ amount: "" }}
                 onSubmit={(values) => {
                   console.log(values.amount * 1e18);
                   transferDAI({
@@ -256,7 +256,7 @@ export default function Dashboard() {
                         </div>
                       </div>
 
-                      <Button type="submit" style={{marginTop: "20px"}}>
+                      <Button type="submit" style={{ marginTop: "20px" }}>
                         Submit
                       </Button>
                     </div>
@@ -320,7 +320,7 @@ export default function Dashboard() {
               <DialogDescription>
                 <div>
                   <Formik
-                    initialValues={{amount: "", chain: ""}}
+                    initialValues={{ amount: "", chain: "" }}
                     onSubmit={(values) => {
                       console.log(values.amount * 1e18);
                       supplyLiquidity({
@@ -386,7 +386,7 @@ export default function Dashboard() {
                               </div>
                             </div>
                           </div>
-                          <Button type="submit" style={{marginTop: "20px"}}>
+                          <Button type="submit" style={{ marginTop: "20px" }}>
                             Submit
                           </Button>
                         </div>
@@ -592,7 +592,7 @@ export default function Dashboard() {
                 size="sm"
                 onClick={() => {
                   console.log(daiBalance);
-                  approveDAI({args: [daiBalance, poolAddress]});
+                  approveDAI({ args: [daiBalance, poolAddress] });
                 }}
               >
                 Approve DAI
@@ -604,7 +604,7 @@ export default function Dashboard() {
 
       <div
         className="grid grid-cols-1 gap-4 p-8 xl:grid-cols-3 xl:grid-rows-5 w-full"
-        // style={{gridTemplateColumns: `repeat(auto-fit, minmax(400px, 1fr))`}}
+      // style={{gridTemplateColumns: `repeat(auto-fit, minmax(400px, 1fr))`}}
       >
         <Dialog open={addMemberModal} onOpenChange={setAddMemberModal}>
           <DialogContent>
@@ -612,7 +612,7 @@ export default function Dashboard() {
               <DialogTitle>Add New Member</DialogTitle>
               <DialogDescription className="h-fit">
                 <Formik
-                  initialValues={{role: "", address: ""}}
+                  initialValues={{ role: "", address: "" }}
                   onSubmit={(values, _) => {
                     addMemberDashboard(values);
                     console.log(values);
@@ -728,7 +728,7 @@ export default function Dashboard() {
                   </div>
                   <Select
                     onValueChange={() =>
-                      toggleFacilitator({args: [memberAddress]})
+                      toggleFacilitator({ args: [memberAddress] })
                     }
                     disabled={address === memberAddress}
                     defaultValue={
@@ -767,7 +767,7 @@ export default function Dashboard() {
                 <DialogDescription className="h-fit">
                   <div>
                     <Formik
-                      initialValues={{amount: ""}}
+                      initialValues={{ amount: "" }}
                       onSubmit={(values) => {
                         console.log(values.amount * 1e18);
                         supplyLiquidity({
@@ -876,7 +876,7 @@ export default function Dashboard() {
                 <DialogTitle>Borrow</DialogTitle>
                 <DialogDescription>
                   <Formik
-                    initialValues={{amount: ""}}
+                    initialValues={{ amount: "" }}
                     onSubmit={(values) => console.log(values)}
                   >
                     {(formik) => (
@@ -958,7 +958,7 @@ export default function Dashboard() {
                       <p>GHO</p>
                     </TableCell>
                     <TableCell>Stable Coin</TableCell>
-                    <TableCell className="text-right">$250.00</TableCell>
+                    <TableCell className="text-right">{Number(borrowAmt) / 1e18} GHO</TableCell>
                     <TableCell className="text-right">
                       <Button size="sm" variant="outline">
                         Repay
@@ -996,7 +996,7 @@ export default function Dashboard() {
                         {item.from.slice(0, 8) + "..." + item.from.slice(-8)}
                       </TableCell>
                       <TableCell>{item.transactionType}</TableCell>
-                      <TableCell>{item.transactionType}</TableCell>
+                      <TableCell>{allMembers[item.from] ? "Facilitator" : "Member"}</TableCell>
                       <TableCell>
                         {item.interactedWith.slice(0, 8) +
                           "..." +
