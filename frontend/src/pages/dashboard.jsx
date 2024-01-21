@@ -262,7 +262,8 @@ export default function Dashboard() {
                           </div>
                         </div>
                       </div>
-                      <Button type="submit" className="mt-[10px]">
+
+                      <Button type="submit" style={{ marginTop: "20px" }}>
                         Submit
                       </Button>
                     </div>
@@ -317,8 +318,85 @@ export default function Dashboard() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Send GHO</DialogTitle>
-            <div className="h-[500px] w-[600px]">
-              <DialogDescription></DialogDescription>
+            <div className="h-fit w-full">
+              <DialogDescription>
+                <div>
+                  <Formik
+                    initialValues={{ amount: "", chain: "" }}
+                    onSubmit={(values) => {
+                      console.log(values.amount * 1e18);
+                      supplyLiquidity({
+                        args: [values.amount * 1e18],
+                      });
+                    }}
+                  >
+                    {(formik) => (
+                      <Form>
+                        <div className="w-full p-4 flex flex-col space-y-3">
+                          <Label htmlFor="email" className="ml-1">
+                            Amount
+                          </Label>
+                          <div className="w-full border-[1px] border-slate-200 h-16 rounded-lg flex flex-col">
+                            <div className="flex h-[60%]">
+                              <Field
+                                as={Input}
+                                name="amount"
+                                type="number"
+                                id="amount"
+                                placeholder="0.00"
+                                className="flex-1 appearance-none focus-visible:ring-0 shadow-none border-none outline-none text-lg"
+                              />
+                              <Select
+                                onValueChange={(val) => {
+                                  formik.setFieldValue("chain", val);
+                                }}
+                              >
+                                <SelectTrigger className="w-fit shadow-none">
+                                  <SelectValue placeholder="Select Chain" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="light" className="w-fit">
+                                    <div className="flex gap-2 items-center pr-4">
+                                      <img
+                                        src="/eth.png"
+                                        alt="eth"
+                                        className="h-5 aspect-square"
+                                      />
+                                      <p>Sepolia Ethereum</p>
+                                    </div>
+                                  </SelectItem>
+                                  <SelectItem value="dark">
+                                    <div className="flex gap-2 items-center pr-4">
+                                      <img
+                                        src="/arbitrum.png"
+                                        alt="arbitrum"
+                                        className="h-5 aspect-square"
+                                      />
+                                      <p>Sepolia Arbitrum</p>
+                                    </div>
+                                  </SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+                            <div className="ml-3 text-xs flex justify-between mr-3">
+                              <div>$34</div>
+                              <div className="flex text-xs gap-1">
+                                <div>GHO Balance: 2</div>
+                                <p className="font-bold cursor-pointer hover:bg-gray-200">
+                                  MAX
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                          <Button type="submit" style={{ marginTop: "20px" }}>
+                            Submit
+                          </Button>
+                        </div>
+                      </Form>
+                    )}
+                  </Formik>
+                </div>
+              </DialogDescription>
             </div>
           </DialogHeader>
         </DialogContent>
