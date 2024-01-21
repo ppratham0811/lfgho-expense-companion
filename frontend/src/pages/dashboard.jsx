@@ -1,7 +1,7 @@
-import { ModeToggle } from "@/components/Toggletheme";
-import { Button } from "@/components/ui/button";
-import { useRouter } from "next/navigation";
-import { useContext, useEffect, useState } from "react";
+import {ModeToggle} from "@/components/Toggletheme";
+import {Button} from "@/components/ui/button";
+import {useRouter} from "next/navigation";
+import {useContext, useEffect, useState} from "react";
 import {
   Table,
   TableBody,
@@ -12,14 +12,14 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-import { useAccount, useNetwork, useSwitchNetwork } from "wagmi";
-import { disconnect } from "@wagmi/core";
+import {useAccount, useNetwork, useSwitchNetwork} from "wagmi";
+import {disconnect} from "@wagmi/core";
 
-import { toast } from "@/components/ui/use-toast";
-import { ConnectKitButton } from "connectkit";
-import { useTheme } from "next-themes";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {toast} from "@/components/ui/use-toast";
+import {ConnectKitButton} from "connectkit";
+import {useTheme} from "next-themes";
+import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
+import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {
   Select,
   SelectContent,
@@ -37,9 +37,9 @@ import {
 } from "@/components/ui/dialog";
 import useWeb3Context from "../hooks/useWeb3Context";
 
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { ErrorMessage, Field, Form, Formik } from "formik";
+import {Label} from "@/components/ui/label";
+import {Input} from "@/components/ui/input";
+import {ErrorMessage, Field, Form, Formik} from "formik";
 import * as Yup from "yup";
 import {
   Tooltip,
@@ -55,14 +55,14 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Menu } from "lucide-react";
+import {Menu} from "lucide-react";
 
 export default function Dashboard() {
-  const { isConnected, address } = useAccount();
-  const { chain } = useNetwork();
+  const {isConnected, address} = useAccount();
+  const {chain} = useNetwork();
   const [mounted, setMounted] = useState(false);
   const router = useRouter();
-  const { chains, switchNetwork } = useSwitchNetwork();
+  const {chains, switchNetwork} = useSwitchNetwork();
 
   // open all modals
   const [openStakingModal, setOpenStakingModal] = useState(false);
@@ -138,11 +138,11 @@ export default function Dashboard() {
     fetchMembers();
   }, []);
 
-  function addMemberDashboard({ role, address }) {
+  function addMemberDashboard({role, address}) {
     if (role === "facilitator") {
-      addNewFacilitator({ args: [address] });
+      addNewFacilitator({args: [address]});
     } else {
-      addNewMember({ args: [address] });
+      addNewMember({args: [address]});
     }
   }
 
@@ -182,7 +182,7 @@ export default function Dashboard() {
             <DialogTitle>Fund your Contract with DAI</DialogTitle>
             <DialogDescription className="h-fit">
               <Formik
-                initialValues={{ amount: "" }}
+                initialValues={{amount: ""}}
                 onSubmit={(values) => {
                   console.log(values.amount * 1e18);
                   transferDAI({
@@ -217,7 +217,8 @@ export default function Dashboard() {
                           </div>
                         </div>
                       </div>
-                      <Button type="submit" className="mt-[10px]">
+
+                      <Button type="submit" style={{marginTop: "20px"}}>
                         Submit
                       </Button>
                     </div>
@@ -272,8 +273,63 @@ export default function Dashboard() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Send GHO</DialogTitle>
-            <div className="h-[500px] w-[600px]">
-              <DialogDescription></DialogDescription>
+            <div className="h-fit w-full">
+              <DialogDescription>
+                <div>
+                  <Formik
+                    initialValues={{amount: ""}}
+                    onSubmit={(values) => {
+                      console.log(values.amount * 1e18);
+                      supplyLiquidity({
+                        args: [values.amount * 1e18],
+                      });
+                    }}
+                  >
+                    {(formik) => (
+                      <Form>
+                        <div className="w-full p-4 flex flex-col space-y-3">
+                          <Label htmlFor="email" className="ml-1">
+                            Amount
+                          </Label>
+                          <div className="w-full border-[1px] border-slate-200 h-16 rounded-lg flex flex-col">
+                            <div className="flex h-[60%]">
+                              <Field
+                                as={Input}
+                                name="amount"
+                                type="number"
+                                id="amount"
+                                placeholder="0.00"
+                                className="flex-1 appearance-none focus-visible:ring-0 shadow-none border-none outline-none text-lg"
+                              />
+
+                              <div className="flex gap-2 items-center pr-4">
+                                <img
+                                  src="/gho.svg"
+                                  alt="gho"
+                                  className="h-5 aspect-square"
+                                />
+                                <p>GHO</p>
+                              </div>
+                            </div>
+                            <div className="ml-3 text-xs flex justify-between mr-3">
+                              <div>$34</div>
+                              <div className="flex text-xs gap-1">
+                                <div>GHO Balance: 2</div>
+                                <p className="font-bold cursor-pointer hover:bg-gray-200">
+                                  MAX
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                          <Button type="submit" style={{marginTop: "20px"}}>
+                            Submit
+                          </Button>
+                        </div>
+                      </Form>
+                    )}
+                  </Formik>
+                </div>
+              </DialogDescription>
             </div>
           </DialogHeader>
         </DialogContent>
@@ -471,7 +527,7 @@ export default function Dashboard() {
                 size="sm"
                 onClick={() => {
                   console.log(daiBalance);
-                  approveDAI({ args: [daiBalance, contractAddress] });
+                  approveDAI({args: [daiBalance, contractAddress]});
                 }}
               >
                 Approve DAI
@@ -483,7 +539,7 @@ export default function Dashboard() {
 
       <div
         className="grid grid-cols-1 gap-4 p-8 xl:grid-cols-3 xl:grid-rows-5 w-full"
-      // style={{gridTemplateColumns: `repeat(auto-fit, minmax(400px, 1fr))`}}
+        // style={{gridTemplateColumns: `repeat(auto-fit, minmax(400px, 1fr))`}}
       >
         <Dialog open={addMemberModal} onOpenChange={setAddMemberModal}>
           <DialogContent>
@@ -491,7 +547,7 @@ export default function Dashboard() {
               <DialogTitle>Add New Member</DialogTitle>
               <DialogDescription className="h-fit">
                 <Formik
-                  initialValues={{ role: "", address: "" }}
+                  initialValues={{role: "", address: ""}}
                   onSubmit={(values, _) => {
                     addMemberDashboard(values);
                     console.log(values);
@@ -578,7 +634,7 @@ export default function Dashboard() {
                   </div>
                   <Select
                     onValueChange={() =>
-                      toggleFacilitator({ args: [memberAddress] })
+                      toggleFacilitator({args: [memberAddress]})
                     }
                     disabled={address === memberAddress}
                     defaultValue={
@@ -617,7 +673,7 @@ export default function Dashboard() {
                 <DialogDescription className="h-fit">
                   <div>
                     <Formik
-                      initialValues={{ amount: "" }}
+                      initialValues={{amount: ""}}
                       onSubmit={(values) => {
                         console.log(values.amount * 1e18);
                         supplyLiquidity({
@@ -720,7 +776,7 @@ export default function Dashboard() {
                 <DialogTitle>Withdraw</DialogTitle>
                 <DialogDescription>
                   <Formik
-                    initialValues={{ amount: "" }}
+                    initialValues={{amount: ""}}
                     onSubmit={(values) => console.log(values)}
                   >
                     {(formik) => (
