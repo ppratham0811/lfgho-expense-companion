@@ -1,14 +1,14 @@
-import { createContext, useState } from "react";
+import {createContext, useState} from "react";
 import DAIabi from "../constant/DAI-abi.json";
-import { ABI as abi } from "@/constant/abi";
-import { useContractWrite, useContractRead } from "wagmi";
-import { useToast } from "@/components/ui/use-toast";
+import {ABI as abi} from "@/constant/abi";
+import {useContractWrite, useContractRead} from "wagmi";
+import {useToast} from "@/components/ui/use-toast";
 
 export const Web3Context = createContext();
 
-const Web3ContextProvider = ({ children }) => {
+const Web3ContextProvider = ({children}) => {
   // toast
-  const { toast } = useToast();
+  const {toast} = useToast();
 
   const [contractAddress, setContractAddress] = useState(
     "0x8511eF562e1D2681c07E7887e185C27CB4d2cb39"
@@ -20,7 +20,7 @@ const Web3ContextProvider = ({ children }) => {
 
   // contract read
 
-  const { refetch: getDaiBalance } = useContractRead({
+  const {refetch: getDaiBalance} = useContractRead({
     address: contractAddress,
     abi: abi,
     functionName: "getBalanceOf",
@@ -54,6 +54,7 @@ const Web3ContextProvider = ({ children }) => {
     refetch: getAllMembers,
     error: error3,
     isLoading: loading3,
+    data: allMembers,
   } = useContractRead({
     address: contractAddress,
     abi: abi,
@@ -64,6 +65,7 @@ const Web3ContextProvider = ({ children }) => {
     refetch: getAllFacilitators,
     error: error4,
     isLoading: loading4,
+    data: allFacilitators,
   } = useContractRead({
     address: contractAddress,
     abi: abi,
@@ -127,6 +129,7 @@ const Web3ContextProvider = ({ children }) => {
     write: addNewMember,
     error: error6,
     isLoading: loading6,
+    isSuccess: addNewMemberisSuccess,
   } = useContractWrite({
     address: contractAddress,
     abi: abi,
@@ -137,6 +140,7 @@ const Web3ContextProvider = ({ children }) => {
     write: addNewFacilitator,
     error: error7,
     isLoading: loading7,
+    isSuccess: addNewFacilitatorisSuccess,
   } = useContractWrite({
     address: contractAddress,
     abi: abi,
@@ -255,6 +259,15 @@ const Web3ContextProvider = ({ children }) => {
   //   });
   // }
 
+  // console.log(
+  //   "allMembers",
+  //   allMembers,
+  //   "allFacilitators",
+  //   allFacilitators,
+  //   "from context"
+  // );
+
+  console.log(loading3, loading4, "loading context");
   return (
     <Web3Context.Provider
       value={{
@@ -280,6 +293,10 @@ const Web3ContextProvider = ({ children }) => {
         transferToUser,
         transferDAIisSuccess,
         withdrawDAI,
+        addNewMemberisSuccess,
+        addNewFacilitatorisSuccess,
+        loading6,
+        loading7,
       }}
     >
       {children}
