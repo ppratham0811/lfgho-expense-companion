@@ -1,7 +1,7 @@
-import {ModeToggle} from "@/components/Toggletheme";
-import {Button} from "@/components/ui/button";
-import {useRouter} from "next/navigation";
-import {useContext, useEffect, useState} from "react";
+import { ModeToggle } from "@/components/Toggletheme";
+import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
+import { useContext, useEffect, useState } from "react";
 import {
   Table,
   TableBody,
@@ -11,13 +11,13 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {useAccount, useNetwork, useSwitchNetwork} from "wagmi";
-import {disconnect} from "@wagmi/core";
-import {toast} from "@/components/ui/use-toast";
-import {ConnectKitButton} from "connectkit";
-import {useTheme} from "next-themes";
-import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
-import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
+import { useAccount, useNetwork, useSwitchNetwork } from "wagmi";
+import { disconnect } from "@wagmi/core";
+import { toast } from "@/components/ui/use-toast";
+import { ConnectKitButton } from "connectkit";
+import { useTheme } from "next-themes";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Select,
   SelectContent,
@@ -34,9 +34,9 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import useWeb3Context from "../hooks/useWeb3Context";
-import {Label} from "@/components/ui/label";
-import {Input} from "@/components/ui/input";
-import {ErrorMessage, Field, Form, Formik} from "formik";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { ErrorMessage, Field, Form, Formik } from "formik";
 import * as Yup from "yup";
 import {
   Tooltip,
@@ -52,15 +52,17 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {Menu} from "lucide-react";
-import {ReloadIcon} from "@radix-ui/react-icons";
+import { Menu } from "lucide-react";
+import { ReloadIcon } from "@radix-ui/react-icons";
 
 export default function Dashboard() {
-  const {isConnected, address} = useAccount();
-  const {chain} = useNetwork();
+  const GHOaddress = "0xc4bF5CbDaBE595361438F8c6a187bDc330539c60";
+
+  const { isConnected, address } = useAccount();
+  const { chain } = useNetwork();
   const [mounted, setMounted] = useState(false);
   const router = useRouter();
-  const {chains, switchNetwork} = useSwitchNetwork();
+  const { chains, switchNetwork } = useSwitchNetwork();
 
   // open all modals
   const [openStakingModal, setOpenStakingModal] = useState(false);
@@ -97,6 +99,7 @@ export default function Dashboard() {
     transferDAIisSuccess,
     addNewMemberisSuccess,
     addNewFacilitatorisSuccess,
+    sendGhoCrossChain,
     loading6,
     loading7,
   } = useWeb3Context();
@@ -176,11 +179,23 @@ export default function Dashboard() {
     fetchMembers();
   }, []);
 
-  function addMemberDashboard({role, address}) {
+  function addMemberDashboard({ role, address }) {
     if (role === "facilitator") {
-      addNewFacilitator({args: [address]});
+      addNewFacilitator({ args: [address] });
     } else {
-      addNewMember({args: [address]});
+      addNewMember({ args: [address] });
+    }
+  }
+
+  function sendGhoToUser({ address, amount, chain }) {
+    if (amount && address) {
+      if (chain === "ethereum") {
+        transferToUser({ args: [address, amount] });
+      } else {
+        sendGhoCrossChain({
+          args: ["16015286601757825753", address, GHOaddress, amount],
+        });
+      }
     }
   }
 
@@ -229,7 +244,7 @@ export default function Dashboard() {
             <DialogTitle>Fund your Contract with DAI</DialogTitle>
             <DialogDescription className="h-fit">
               <Formik
-                initialValues={{amount: ""}}
+                initialValues={{ amount: "" }}
                 onSubmit={(values) => {
                   console.log(values.amount * 1e18);
                   transferDAI({
@@ -265,7 +280,7 @@ export default function Dashboard() {
                         </div>
                       </div>
 
-                      <Button type="submit" style={{marginTop: "20px"}}>
+                      <Button type="submit" style={{ marginTop: "20px" }}>
                         Submit
                       </Button>
                     </div>
@@ -283,7 +298,7 @@ export default function Dashboard() {
             <DialogTitle>Withdraw your staked DAI</DialogTitle>
             <DialogDescription className="h-fit">
               <Formik
-                initialValues={{amount: ""}}
+                initialValues={{ amount: "" }}
                 onSubmit={(values) => {
                   console.log(values.amount * 1e18);
                   withdrawDAI({
@@ -319,7 +334,7 @@ export default function Dashboard() {
                         </div>
                       </div>
 
-                      <Button type="submit" style={{marginTop: "20px"}}>
+                      <Button type="submit" style={{ marginTop: "20px" }}>
                         Submit
                       </Button>
                     </div>
@@ -383,13 +398,8 @@ export default function Dashboard() {
               <DialogDescription>
                 <div>
                   <Formik
-                    initialValues={{amount: "", chain: ""}}
-                    onSubmit={(values) => {
-                      console.log(values.amount * 1e18);
-                      supplyLiquidity({
-                        args: [values.amount * 1e18],
-                      });
-                    }}
+                    initialValues={{ address: "", amount: "", chain: "" }}
+                    onSubmit={(values) => sendGhoToUser(values)}
                   >
                     {(formik) => (
                       <Form>
@@ -416,7 +426,10 @@ export default function Dashboard() {
                                   <SelectValue placeholder="Select Chain" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                  <SelectItem value="light" className="w-fit">
+                                  <SelectItem
+                                    value="ethereum"
+                                    className="w-fit"
+                                  >
                                     <div className="flex gap-2 items-center pr-4">
                                       <img
                                         src="/eth.png"
@@ -426,7 +439,7 @@ export default function Dashboard() {
                                       <p>Sepolia Ethereum</p>
                                     </div>
                                   </SelectItem>
-                                  <SelectItem value="dark">
+                                  <SelectItem value="arbitrum">
                                     <div className="flex gap-2 items-center pr-4">
                                       <img
                                         src="/arbitrum.png"
@@ -448,8 +461,39 @@ export default function Dashboard() {
                                 </p>
                               </div>
                             </div>
+                            <div className="w-full border-[1px] border-slate-200 h-16 rounded-lg flex flex-col space-y-3">
+                              <Select
+                                onValueChange={(val) => {
+                                  formik.setFieldValue("address", val);
+                                }}
+                              >
+                                <SelectTrigger className="w-fit shadow-none">
+                                  <SelectValue placeholder="Select Member" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {Object.keys(allMembers).map((addr, idx) => (
+                                    <>
+                                      <SelectItem
+                                        value={addr}
+                                        className="w-fit"
+                                        key={idx}
+                                      >
+                                        <div className="flex gap-2 items-center pr-4">
+                                          <img
+                                            src="/eth.png"
+                                            alt="eth"
+                                            className="h-5 aspect-square"
+                                          />
+                                          <p>{addr}</p>
+                                        </div>
+                                      </SelectItem>
+                                    </>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            </div>
                           </div>
-                          <Button type="submit" style={{marginTop: "20px"}}>
+                          <Button type="submit" style={{ marginTop: "20px" }}>
                             Submit
                           </Button>
                         </div>
@@ -510,7 +554,7 @@ export default function Dashboard() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                {Number(daiBalance) / 1e18} DAI
+                {Number(suppliedAmt) / 1e18} DAI
               </div>
               <p className="text-xs text-muted-foreground"> </p>
             </CardContent>
@@ -561,7 +605,7 @@ export default function Dashboard() {
               </svg>
             </CardHeader>
             <CardContent className="flex justify-between items-center">
-              <div className="text-2xl font-bold">
+              <div className="text-2xl font-bold truncate">
                 {Number(aDaiBalance) / 1e18}
               </div>
               {/* <p className="text-xs text-muted-foreground"> </p> */}
@@ -655,7 +699,7 @@ export default function Dashboard() {
                 size="sm"
                 onClick={() => {
                   console.log(daiBalance);
-                  approveDAI({args: [daiBalance, poolAddress]});
+                  approveDAI({ args: [daiBalance, poolAddress] });
                 }}
               >
                 Approve DAI
@@ -675,7 +719,7 @@ export default function Dashboard() {
               <DialogTitle>Add New Member</DialogTitle>
               <DialogDescription className="h-fit">
                 <Formik
-                  initialValues={{role: "", address: ""}}
+                  initialValues={{ role: "", address: "" }}
                   onSubmit={(values, _) => {
                     addMemberDashboard(values);
                     console.log(values);
@@ -791,7 +835,7 @@ export default function Dashboard() {
                   </div>
                   <Select
                     onValueChange={() =>
-                      toggleFacilitator({args: [memberAddress]})
+                      toggleFacilitator({ args: [memberAddress] })
                     }
                     disabled={address === memberAddress}
                     defaultValue={
@@ -830,7 +874,7 @@ export default function Dashboard() {
                 <DialogDescription className="h-fit">
                   <div>
                     <Formik
-                      initialValues={{amount: ""}}
+                      initialValues={{ amount: "" }}
                       onSubmit={(values) => {
                         console.log(values.amount * 1e18);
                         supplyLiquidity({
@@ -943,7 +987,7 @@ export default function Dashboard() {
                 <DialogTitle>Borrow</DialogTitle>
                 <DialogDescription>
                   <Formik
-                    initialValues={{amount: ""}}
+                    initialValues={{ amount: "" }}
                     onSubmit={(values) => console.log(values)}
                   >
                     {(formik) => (

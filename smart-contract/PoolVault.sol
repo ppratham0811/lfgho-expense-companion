@@ -268,7 +268,8 @@ contract PoolBorrow {
             0x29598b72eb5CeBd806C5dCD549490FdA35B13cD8
         );
         require(amount_ <= adaiBalance, "amount is greater than daiBalance");
-        POOL.withdraw(daiAddress, amount_, msg.sender);
+        POOL.withdraw(daiAddress, amount_, address(this));
+        suppliedAmt -= amount_;
     }
 
     function sendGhoToContract(uint256 amount_) public {
