@@ -93,13 +93,15 @@ export default function Dashboard() {
     getBorrowAmt,
     getAllTransactions,
     transferToUser,
-
+    withdrawDAI,
     transferDAIisSuccess,
   } = useWeb3Context();
 
   const [addMemberModal, setAddMemberModal] = useState(false);
 
   const [openFundContractModal, setOpenFundContractModal] = useState(false);
+  const [openWithdrawDai, setOpenWithdrawDai] = useState(false);
+
   const [suppliedAmt, setSuppliedAmt] = useState(0);
   const [borrowAmt, setBorrowAmt] = useState(0);
   const [daiBalance, setDaiBalance] = useState(0);
@@ -225,6 +227,60 @@ export default function Dashboard() {
                   console.log(values.amount * 1e18);
                   transferDAI({
                     args: [contractAddress, values.amount * 1e18],
+                  });
+                }}
+              >
+                {(formik) => (
+                  <Form>
+                    <div className="w-full p-4 flex flex-col space-y-3">
+                      <Label htmlFor="email" className="ml-1">
+                        Amount
+                      </Label>
+                      <div className="w-full border-[1px] border-slate-200 rounded-lg flex flex-col">
+                        <div className="flex h-[60%]">
+                          <Field
+                            as={Input}
+                            name="amount"
+                            type="number"
+                            id="amount"
+                            placeholder="0.00"
+                            className="flex-1 appearance-none focus-visible:ring-0 shadow-none border-none outline-none text-lg"
+                          />
+
+                          <div className="flex gap-2 items-center pr-4">
+                            <img
+                              src="/dai.svg"
+                              alt="dai"
+                              className="h-5 aspect-square"
+                            />
+                            <p>DAI</p>
+                          </div>
+                        </div>
+                      </div>
+
+                      <Button type="submit" style={{ marginTop: "20px" }}>
+                        Submit
+                      </Button>
+                    </div>
+                  </Form>
+                )}
+              </Formik>
+            </DialogDescription>
+          </DialogHeader>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={openWithdrawDai} onOpenChange={setOpenWithdrawDai}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Withdraw your staked DAI</DialogTitle>
+            <DialogDescription className="h-fit">
+              <Formik
+                initialValues={{ amount: "" }}
+                onSubmit={(values) => {
+                  console.log(values.amount * 1e18);
+                  withdrawDAI({
+                    args: [values.amount * 1e18],
                   });
                 }}
               >
@@ -586,7 +642,7 @@ export default function Dashboard() {
             </CardHeader>
             <CardContent className="flex justify-between">
               <div className="text-2xl font-bold">
-                {Number(daiBalance) / 1e18}
+                {Number(daiBalance) / 1e18} DAI
               </div>
               <Button
                 size="sm"
@@ -604,7 +660,7 @@ export default function Dashboard() {
 
       <div
         className="grid grid-cols-1 gap-4 p-8 xl:grid-cols-3 xl:grid-rows-5 w-full"
-      // style={{gridTemplateColumns: `repeat(auto-fit, minmax(400px, 1fr))`}}
+        // style={{gridTemplateColumns: `repeat(auto-fit, minmax(400px, 1fr))`}}
       >
         <Dialog open={addMemberModal} onOpenChange={setAddMemberModal}>
           <DialogContent>
@@ -859,7 +915,11 @@ export default function Dashboard() {
                       {Number(suppliedAmt) / 1e18} DAI
                     </TableCell>
                     <TableCell className="text-right">
-                      <Button size="sm" variant="outline">
+                      <Button
+                        onClick={() => setOpenWithdrawDai((prev) => !prev)}
+                        size="sm"
+                        variant="outline"
+                      >
                         Withdraw
                       </Button>
                     </TableCell>
@@ -958,7 +1018,9 @@ export default function Dashboard() {
                       <p>GHO</p>
                     </TableCell>
                     <TableCell>Stable Coin</TableCell>
-                    <TableCell className="text-right">{Number(borrowAmt) / 1e18} GHO</TableCell>
+                    <TableCell className="text-right">
+                      {Number(borrowAmt) / 1e18} GHO
+                    </TableCell>
                     <TableCell className="text-right">
                       <Button size="sm" variant="outline">
                         Repay
@@ -996,7 +1058,9 @@ export default function Dashboard() {
                         {item.from.slice(0, 8) + "..." + item.from.slice(-8)}
                       </TableCell>
                       <TableCell>{item.transactionType}</TableCell>
-                      <TableCell>{allMembers[item.from] ? "Facilitator" : "Member"}</TableCell>
+                      <TableCell>
+                        {allMembers[item.from] ? "Facilitator" : "Member"}
+                      </TableCell>
                       <TableCell>
                         {item.interactedWith.slice(0, 8) +
                           "..." +
