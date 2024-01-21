@@ -70,6 +70,49 @@ const Web3ContextProvider = ({ children }) => {
     functionName: "getAllFacilitators",
   });
 
+
+  const {
+    data: getPool,
+    error: error13,
+    isLoading: loading13,
+  } = useContractRead({
+    address: contractAddress,
+    abi: abi,
+    functionName: "getPool",
+  });
+
+  const {
+    data: suppliedAmt,
+    error: error14,
+    isLoading: loading14,
+  } = useContractRead({
+    address: contractAddress,
+    abi: abi,
+    functionName: "getsuppliedAmt",
+  });
+
+  const {
+    data: borrowAmt,
+    error: error15,
+    isLoading: loading15,
+  } = useContractRead({
+    address: contractAddress,
+    abi: abi,
+    functionName: "getBorrowAmt",
+  });
+
+  const {
+    data: transactions,
+    error: error16,
+    isLoading: loading16,
+  } = useContractRead({
+    address: contractAddress,
+    abi: abi,
+    functionName: "getAllTransactions",
+  });
+
+
+
   // contract write
 
   const {
@@ -199,6 +242,12 @@ const Web3ContextProvider = ({ children }) => {
         addNewMember,
         addNewFacilitator,
         toggleFacilitator,
+        getPool,
+        borrowGHO,
+        transferGHOToMetamask,
+        suppliedAmt,
+        borrowAmt,
+        transactions
       }}
     >
       {children}
