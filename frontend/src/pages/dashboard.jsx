@@ -1,7 +1,7 @@
-import { ModeToggle } from "@/components/Toggletheme";
-import { Button } from "@/components/ui/button";
-import { useRouter } from "next/navigation";
-import { useContext, useEffect, useState } from "react";
+import {ModeToggle} from "@/components/Toggletheme";
+import {Button} from "@/components/ui/button";
+import {useRouter} from "next/navigation";
+import {useContext, useEffect, useState} from "react";
 import {
   Table,
   TableBody,
@@ -11,13 +11,13 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useAccount, useNetwork, useSwitchNetwork, useBalance } from "wagmi";
-import { disconnect } from "@wagmi/core";
-import { toast } from "@/components/ui/use-toast";
-import { ConnectKitButton } from "connectkit";
-import { useTheme } from "next-themes";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {useAccount, useNetwork, useSwitchNetwork, useBalance} from "wagmi";
+import {disconnect} from "@wagmi/core";
+import {toast} from "@/components/ui/use-toast";
+import {ConnectKitButton} from "connectkit";
+import {useTheme} from "next-themes";
+import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
+import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {
   Select,
   SelectContent,
@@ -34,9 +34,9 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import useWeb3Context from "../hooks/useWeb3Context";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { ErrorMessage, Field, Form, Formik } from "formik";
+import {Label} from "@/components/ui/label";
+import {Input} from "@/components/ui/input";
+import {ErrorMessage, Field, Form, Formik} from "formik";
 import * as Yup from "yup";
 import {
   Tooltip,
@@ -52,17 +52,17 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Menu } from "lucide-react";
-import { ReloadIcon } from "@radix-ui/react-icons";
+import {Menu} from "lucide-react";
+import {ReloadIcon} from "@radix-ui/react-icons";
 
 export default function Dashboard() {
   const GHOaddress = "0xc4bF5CbDaBE595361438F8c6a187bDc330539c60";
 
-  const { isConnected, address } = useAccount();
-  const { chain } = useNetwork();
+  const {isConnected, address} = useAccount();
+  const {chain} = useNetwork();
   const [mounted, setMounted] = useState(false);
   const router = useRouter();
-  const { chains, switchNetwork } = useSwitchNetwork();
+  const {chains, switchNetwork} = useSwitchNetwork();
 
   // open all modals
   const [openStakingModal, setOpenStakingModal] = useState(false);
@@ -111,6 +111,7 @@ export default function Dashboard() {
   const [addMemberModal, setAddMemberModal] = useState(false);
   const [openFundContractModal, setOpenFundContractModal] = useState(false);
   const [openWithdrawDai, setOpenWithdrawDai] = useState(false);
+  const [openFundGHOModal, setOpenFundGHOModal] = useState(false);
 
   // imp functions
   const [suppliedAmt, setSuppliedAmt] = useState(0);
@@ -182,17 +183,17 @@ export default function Dashboard() {
     fetchMembers();
   }, []);
 
-  function addMemberDashboard({ role, address }) {
+  function addMemberDashboard({role, address}) {
     if (role === "facilitator") {
-      addNewFacilitator({ args: [address] });
+      addNewFacilitator({args: [address]});
     } else {
-      addNewMember({ args: [address] });
+      addNewMember({args: [address]});
     }
   }
 
-  function sendGhoToUser({ address, amount, chain }) {
+  function sendGhoToUser({address, amount, chain}) {
     if (chain === "ethereum") {
-      transferToUser({ args: [address, amount] });
+      transferToUser({args: [address, amount * 1e18]});
     } else {
       console.log("send gho cross chain");
       sendGhoCrossChain({
@@ -266,20 +267,22 @@ export default function Dashboard() {
   // console.log(balance.data, balance.isLoading, "balance");
 
   useEffect(() => {
-    if (!balance.isLoading) {
-      setWalletDaiBalance(Number(balance.data.formatted));
-    }
+    if (balance) {
+      if (!balance.isLoading) {
+        setWalletDaiBalance(Number(balance.data.formatted));
+      }
 
-    if (!balance1.isLoading) {
-      setWalletGHOBalance(Number(balance1.data.formatted));
-    }
+      if (!balance1.isLoading) {
+        setWalletGHOBalance(Number(balance1.data.formatted));
+      }
 
-    if (!balance2.isLoading) {
-      setWalletDaiBalance(Number(balance2.data.formatted));
-    }
+      if (!balance2.isLoading) {
+        setWalletDaiBalance(Number(balance2.data.formatted));
+      }
 
-    if (!balance3.isLoading) {
-      setWalletGHOBalance(Number(balance3.data.formatted));
+      if (!balance3.isLoading) {
+        setWalletGHOBalance(Number(balance3.data.formatted));
+      }
     }
   }, [balance, balance1, balance2, balance3]);
 
@@ -302,7 +305,7 @@ export default function Dashboard() {
             <DialogTitle>Fund your Contract with DAI</DialogTitle>
             <DialogDescription className="h-fit">
               <Formik
-                initialValues={{ amount: "" }}
+                initialValues={{amount: ""}}
                 onSubmit={(values) => {
                   console.log(values.amount * 1e18);
                   transferDAI({
@@ -338,7 +341,62 @@ export default function Dashboard() {
                         </div>
                       </div>
 
-                      <Button type="submit" style={{ marginTop: "20px" }}>
+                      <Button type="submit" style={{marginTop: "20px"}}>
+                        Submit
+                      </Button>
+                    </div>
+                  </Form>
+                )}
+              </Formik>
+            </DialogDescription>
+          </DialogHeader>
+        </DialogContent>
+      </Dialog>
+
+      {/* for gho */}
+      <Dialog open={openFundGHOModal} onOpenChange={setOpenFundGHOModal}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Fund your Contract with GHO</DialogTitle>
+            <DialogDescription className="h-fit">
+              <Formik
+                initialValues={{amount: ""}}
+                onSubmit={(values) => {
+                  console.log(values.amount * 1e18);
+                  transferDAI({
+                    args: [contractAddress, values.amount * 1e18],
+                  });
+                }}
+              >
+                {(formik) => (
+                  <Form>
+                    <div className="w-full p-4 flex flex-col space-y-3">
+                      <Label htmlFor="email" className="ml-1">
+                        Amount
+                      </Label>
+                      <div className="w-full border-[1px] border-slate-200 rounded-lg flex flex-col">
+                        <div className="flex h-[60%]">
+                          <Field
+                            as={Input}
+                            name="amount"
+                            type="number"
+                            id="amount"
+                            placeholder="0.00"
+                            className="flex-1 appearance-none focus-visible:ring-0 shadow-none border-none outline-none text-lg"
+                          />
+
+                          <div className="flex gap-2 items-center pr-4">
+                            <img
+                              src="/gho.svg"
+                              alt="gho"
+                              className="h-5 aspect-square"
+                            />
+                            <p>GHO</p>
+                          </div>
+                        </div>
+                      </div>
+
+                      <Button type="submit" style={{marginTop: "20px"}}>
                         Submit
                       </Button>
                     </div>
@@ -356,7 +414,7 @@ export default function Dashboard() {
             <DialogTitle>Withdraw your staked DAI</DialogTitle>
             <DialogDescription className="h-fit">
               <Formik
-                initialValues={{ amount: "" }}
+                initialValues={{amount: ""}}
                 onSubmit={(values) => {
                   console.log(values.amount * 1e18);
                   withdrawDAI({
@@ -392,7 +450,7 @@ export default function Dashboard() {
                         </div>
                       </div>
 
-                      <Button type="submit" style={{ marginTop: "20px" }}>
+                      <Button type="submit" style={{marginTop: "20px"}}>
                         Submit
                       </Button>
                     </div>
@@ -411,11 +469,19 @@ export default function Dashboard() {
         <div className="flex space-x-5 items-center">
           <Button
             variant="secondary"
+            onClick={() => setOpenFundGHOModal((prev) => !prev)}
+            className="hidden xl:block"
+          >
+            Add GHO to Vault
+          </Button>
+          <Button
+            variant="secondary"
             onClick={() => setOpenFundContractModal((prev) => !prev)}
             className="hidden xl:block"
           >
-            Fund Contract
+            Add DAI to Vault
           </Button>
+
           <Button
             variant="secondary"
             onClick={() => setSendGHOModal((prev) => !prev)}
@@ -423,6 +489,7 @@ export default function Dashboard() {
           >
             Send GHO
           </Button>
+
           <div className="hidden md:block">
             <ConnectKitButton mode={theme.theme} />
           </div>
@@ -456,8 +523,10 @@ export default function Dashboard() {
               <DialogDescription>
                 <div>
                   <Formik
-                    initialValues={{ address: "", amount: "", chain: "" }}
-                    onSubmit={(values) => sendGhoToUser(values)}
+                    initialValues={{address: "", amount: "", chain: ""}}
+                    onSubmit={(values) => {
+                      sendGhoToUser(values);
+                    }}
                   >
                     {(formik) => (
                       <Form>
@@ -513,7 +582,9 @@ export default function Dashboard() {
                             </div>
                             <div className="ml-3 text-xs flex justify-between mr-3">
                               <div className="flex text-xs gap-1">
-                                <div>GHO Balance: {walletGHOBalance}</div>
+                                <div>
+                                  GHO Balance: {Number(GHOBalance) / 1e18}
+                                </div>
                                 {/* <p className="font-bold cursor-pointer hover:bg-gray-200">
                                   MAX
                                 </p> */}
@@ -536,7 +607,7 @@ export default function Dashboard() {
                           <div>
                             {<p>{crossChainHash && crossChainHash.hash}</p>}
                           </div>
-                          <Button type="submit" style={{ marginTop: "20px" }}>
+                          <Button type="submit" style={{marginTop: "20px"}}>
                             Submit
                           </Button>
                         </div>
@@ -694,7 +765,7 @@ export default function Dashboard() {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">
-                GHO Contract Balance
+                GHO Vault Balance
               </CardTitle>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -744,7 +815,7 @@ export default function Dashboard() {
                 size="sm"
                 onClick={() => {
                   console.log(daiBalance);
-                  approveDAI({ args: [daiBalance, poolAddress] });
+                  approveDAI({args: [daiBalance, poolAddress]});
                 }}
               >
                 Approve DAI
@@ -764,7 +835,7 @@ export default function Dashboard() {
               <DialogTitle>Add New Member</DialogTitle>
               <DialogDescription className="h-fit">
                 <Formik
-                  initialValues={{ role: "", address: "" }}
+                  initialValues={{role: "", address: ""}}
                   onSubmit={(values, _) => {
                     addMemberDashboard(values);
                     console.log(values);
@@ -880,7 +951,7 @@ export default function Dashboard() {
                   </div>
                   <Select
                     onValueChange={() =>
-                      toggleFacilitator({ args: [memberAddress] })
+                      toggleFacilitator({args: [memberAddress]})
                     }
                     disabled={address === memberAddress}
                     defaultValue={
@@ -919,7 +990,7 @@ export default function Dashboard() {
                 <DialogDescription className="h-fit">
                   <div>
                     <Formik
-                      initialValues={{ amount: "" }}
+                      initialValues={{amount: ""}}
                       onSubmit={(values) => {
                         // console.log(values.amount * 1e18);
                         supplyLiquidity({
@@ -982,13 +1053,34 @@ export default function Dashboard() {
           <Card className="h-full w-full">
             <CardHeader className="flex flex-row items-center justify-between px-4 pt-4 pb-1">
               <CardTitle>Your Supplies</CardTitle>
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => setOpenStakingModal((prev) => !prev)}
-              >
-                Stake
-              </Button>
+              {!allMembers[address] ? (
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => setOpenStakingModal((prev) => !prev)}
+                        disabled={!allMembers[address]}
+                      >
+                        Stake
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Not Facilitator</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              ) : (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => setOpenStakingModal((prev) => !prev)}
+                  disabled={!allMembers[address]}
+                >
+                  Stake
+                </Button>
+              )}
             </CardHeader>
             <CardContent className="px-3 pt- card-content">
               <Table>
@@ -1016,13 +1108,36 @@ export default function Dashboard() {
                       {Number(suppliedAmt) / 1e18} DAI
                     </TableCell>
                     <TableCell className="text-right">
-                      <Button
-                        onClick={() => setOpenWithdrawDai((prev) => !prev)}
-                        size="sm"
-                        variant="outline"
-                      >
-                        Withdraw
-                      </Button>
+                      {!allMembers[address] ? (
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger>
+                              <Button
+                                onClick={() =>
+                                  setOpenWithdrawDai((prev) => !prev)
+                                }
+                                size="sm"
+                                variant="outline"
+                                disabled={!allMembers[address]}
+                              >
+                                Withdraw
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>Not Facilitator</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      ) : (
+                        <Button
+                          onClick={() => setOpenWithdrawDai((prev) => !prev)}
+                          size="sm"
+                          variant="outline"
+                          disabled={!allMembers[address]}
+                        >
+                          Withdraw
+                        </Button>
+                      )}
                     </TableCell>
                   </TableRow>
                 </TableBody>
@@ -1037,7 +1152,7 @@ export default function Dashboard() {
                 <DialogTitle>Borrow</DialogTitle>
                 <DialogDescription>
                   <Formik
-                    initialValues={{ amount: "" }}
+                    initialValues={{amount: ""}}
                     onSubmit={(values) => console.log(values)}
                   >
                     {(formik) => (
@@ -1089,13 +1204,34 @@ export default function Dashboard() {
           <Card className="h-full w-full">
             <CardHeader className="flex flex-row items-center justify-between px-4 pt-4 pb-1">
               <CardTitle>GHO Borrowed</CardTitle>
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => setOpenWithdrawModal((prev) => !prev)}
-              >
-                Borrow GHO
-              </Button>
+              {!allMembers[address] ? (
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => setOpenWithdrawModal((prev) => !prev)}
+                        disabled={!allMembers[address]}
+                      >
+                        Borrow GHO
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Not Facilitator</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              ) : (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => setOpenWithdrawModal((prev) => !prev)}
+                  disabled={!allMembers[address]}
+                >
+                  Borrow GHO
+                </Button>
+              )}
             </CardHeader>
             <CardContent>
               <Table>
@@ -1123,9 +1259,32 @@ export default function Dashboard() {
                       {Number(borrowAmt) / 1e18} GHO
                     </TableCell>
                     <TableCell className="text-right">
-                      <Button size="sm" variant="outline">
-                        Repay
-                      </Button>
+                      {!allMembers[address] ? (
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                disabled={!allMembers[address]}
+                              >
+                                Repay
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>Not Facilitator</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      ) : (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          disabled={!allMembers[address]}
+                        >
+                          Repay
+                        </Button>
+                      )}
                     </TableCell>
                   </TableRow>
                 </TableBody>
