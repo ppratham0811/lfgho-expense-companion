@@ -8,7 +8,7 @@ export const Web3Context = createContext();
 
 const Web3ContextProvider = ({ children }) => {
   // toast
-  const toast = useToast();
+  const { toast } = useToast();
 
   const [contractAddress, setContractAddress] = useState(
     "0x1152B04B6f5E8BA27192425b0313D07D1127E369"
@@ -20,7 +20,7 @@ const Web3ContextProvider = ({ children }) => {
 
   // contract read
 
-  const { data: daiBalance } = useContractRead({
+  const { refetch: getDaiBalance } = useContractRead({
     address: contractAddress,
     abi: abi,
     functionName: "getBalanceOf",
@@ -82,7 +82,7 @@ const Web3ContextProvider = ({ children }) => {
   });
 
   const {
-    data: suppliedAmt,
+    refetch: getsuppliedAmt,
     error: error14,
     isLoading: loading14,
   } = useContractRead({
@@ -92,7 +92,7 @@ const Web3ContextProvider = ({ children }) => {
   });
 
   const {
-    data: borrowAmt,
+    refetch: getBorrowAmt,
     error: error15,
     isLoading: loading15,
   } = useContractRead({
@@ -102,7 +102,7 @@ const Web3ContextProvider = ({ children }) => {
   });
 
   const {
-    data: transactions,
+    refetch: getAllTransactions,
     error: error16,
     isLoading: loading16,
   } = useContractRead({
@@ -119,6 +119,7 @@ const Web3ContextProvider = ({ children }) => {
     write: transferDAI,
     error: error5,
     isLoading: loading5,
+    isSuccess: transferDAIisSuccess,
   } = useContractWrite({
     address: DAIaddress,
     abi: DAIabi,
@@ -195,36 +196,59 @@ const Web3ContextProvider = ({ children }) => {
     functionName: "approveDAI",
   });
 
-  if (
-    error1 ||
-    error2 ||
-    error3 ||
-    error4 ||
-    error5 ||
-    error6 ||
-    error7 ||
-    error8 ||
-    error9 ||
-    error10 ||
-    error11 ||
-    error12
-  ) {
-    toast({
-      title: "Error",
-      description:
-        error1 ||
-        error2 ||
-        error3 ||
-        error4 ||
-        error5 ||
-        error6 ||
-        error7 ||
-        error8 ||
-        error9 ||
-        error10 ||
-        error11,
-    });
-  }
+  const {
+    write: transferToUser,
+    error: error17,
+    isLoading: loading17,
+  } = useContractWrite({
+    address: contractAddress,
+    abi: abi,
+    functionName: "transferToUser",
+  });
+
+
+  // if (
+  //   error1 ||
+  //   error2 ||
+  //   error3 ||
+  //   error4 ||
+  //   error5 ||
+  //   error6 ||
+  //   error7 ||
+  //   error8 ||
+  //   error9 ||
+  //   error10 ||
+  //   error11 ||
+  //   error12 ||
+  //   error13 ||
+  //   error14 ||
+  //   error15 ||
+  //   error16 ||
+  //   error17
+
+  // ) {
+  //   toast({
+  //     title: "Error",
+  //     description:
+  //       error1 ||
+  //       error2 ||
+  //       error3 ||
+  //       error4 ||
+  //       error5 ||
+  //       error6 ||
+  //       error7 ||
+  //       error8 ||
+  //       error9 ||
+  //       error10 ||
+  //       error11 ||
+  //       error12 ||
+  //       error13 ||
+  //       error14 ||
+  //       error15 ||
+  //       error16 ||
+  //       error17
+  //   });
+  // }
 
   return (
     <Web3Context.Provider
@@ -233,7 +257,7 @@ const Web3ContextProvider = ({ children }) => {
         setContractAddress,
         transferDAI,
         approveDAI,
-        daiBalance,
+        getDaiBalance,
         supplyLiquidity,
         aDaiBalance,
         getAllMembers,
@@ -245,9 +269,11 @@ const Web3ContextProvider = ({ children }) => {
         getPool,
         borrowGHO,
         transferGHOToMetamask,
-        suppliedAmt,
-        borrowAmt,
-        transactions
+        getsuppliedAmt,
+        getBorrowAmt,
+        getAllTransactions,
+        transferToUser,
+        transferDAIisSuccess
       }}
     >
       {children}

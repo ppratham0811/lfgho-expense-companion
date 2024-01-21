@@ -79,7 +79,7 @@ export default function Dashboard() {
     contractAddress,
     transferDAI,
     approveDAI,
-    daiBalance,
+    getDaiBalance,
     supplyLiquidity,
     aDaiBalance: getADAIBalance,
     GHOBalance: getGHOBalance,
@@ -88,17 +88,47 @@ export default function Dashboard() {
     addNewMember,
     addNewFacilitator,
     toggleFacilitator,
+    borrowGHO,
+    getPool: poolAddress,
+    transferGHOToMetamask,
+    getsuppliedAmt,
+    getBorrowAmt,
+    getAllTransactions,
+    transferToUser,
+
+    transferDAIisSuccess
   } = useWeb3Context();
 
   const [addMemberModal, setAddMemberModal] = useState(false);
 
   const [openFundContractModal, setOpenFundContractModal] = useState(false);
+  const [suppliedAmt, setSuppliedAmt] = useState(0);
+  const [borrowAmt, setBorrowAmt] = useState(0);
+  const [daiBalance, setDaiBalance] = useState(0);
+  const [allTransactions, setAllTransactions] = useState([]);
+
 
   useEffect(() => {
     (async function () {
       let balance = await getADAIBalance();
       setaDaiBalance(balance.data);
       console.log("adai balance: ", balance);
+
+      let daiBalance = await getDaiBalance();
+      setDaiBalance(daiBalance.data);
+      console.log("dai balance: ", daiBalance.data);
+
+      let suppliedAmt = await getsuppliedAmt();
+      setSuppliedAmt(suppliedAmt.data);
+      console.log("suppliedAmt: ", suppliedAmt);
+
+      let borrowAmt = await getBorrowAmt();
+      setBorrowAmt(borrowAmt.data);
+      console.log("borrowAmt: ", borrowAmt);
+
+      let transactions = await getAllTransactions();
+      setAllTransactions(transactions.data);
+      console.log("transactions: ", transactions);
     })();
   }, []);
 
@@ -107,6 +137,8 @@ export default function Dashboard() {
       let balance = await getGHOBalance();
       setGHOBalance(balance.data);
       console.log("GHO balance: ", balance);
+
+
     })();
   }, []);
 
@@ -160,6 +192,19 @@ export default function Dashboard() {
       description: "Wallet disconnected successfully",
     });
   };
+
+  // loading useEffects
+
+  useEffect(() => {
+    (async function () {
+      if (transferDAIisSuccess) {
+        let daiBalance = await getDaiBalance();
+        setDaiBalance(daiBalance.data);
+      }
+    })()
+
+  }, [transferDAIisSuccess]);
+
 
   const theme = useTheme();
 
@@ -471,7 +516,7 @@ export default function Dashboard() {
                 size="sm"
                 onClick={() => {
                   console.log(daiBalance);
-                  approveDAI({ args: [daiBalance, contractAddress] });
+                  approveDAI({ args: [daiBalance, poolAddress] });
                 }}
               >
                 Approve DAI
@@ -705,7 +750,7 @@ export default function Dashboard() {
                     </TableCell>
                     <TableCell>Collateral</TableCell>
                     <TableCell className="text-right">
-                      {Number(daiBalance) / 1e18} DAI
+                      {Number(suppliedAmt) / 1e18} DAI
                     </TableCell>
                   </TableRow>
                 </TableBody>
@@ -801,7 +846,7 @@ export default function Dashboard() {
                       <p>GHO</p>
                     </TableCell>
                     <TableCell>Stable Coin</TableCell>
-                    <TableCell className="text-right">$250.00</TableCell>
+                    <TableCell className="text-right">{Number(borrowAmt) / 1e18} GHO</TableCell>
                   </TableRow>
                 </TableBody>
               </Table>
@@ -811,7 +856,7 @@ export default function Dashboard() {
         <div className="h-full w-full xl:row-start-3 xl:row-end-6 xl:col-span-2">
           <Card className="w-full overflow-y-scroll relative px-3 card-scroll h-[300px]">
             <CardHeader className="sticky top-0 bg-white dark:bg-background z-10">
-              <CardTitle>Your Transactions</CardTitle>
+              <CardTitle>All Transactions</CardTitle>
             </CardHeader>
             <CardContent className="card-content relative">
               <Table className="h-full w-full relative">
@@ -820,7 +865,7 @@ export default function Dashboard() {
                     <TableHead className="w-[100px]">Address</TableHead>
                     <TableHead>Type</TableHead>
                     <TableHead>Role</TableHead>
-                    <TableHead>Method</TableHead>
+                    <TableHead>Interacted with</TableHead>
                     <TableHead className="text-right">Amount</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -828,30 +873,21 @@ export default function Dashboard() {
                 <TableBody>
                   {" "}
                   {/* Set a max height for the table body */}
-                  {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((item, index) => (
+                  {allTransactions.map((item, index) => (
                     <TableRow key={index}>
-                      <TableCell className="font-medium">{"0x..."}</TableCell>
-                      <TableCell>Stake</TableCell>
-                      <TableCell>Facilitator</TableCell>
-                      <TableCell>
-                        {direction === "left" && (
-                          <div className="flex gap-2">
-                            <p>Stake</p>
-                            <img
-                              src="/gho.svg"
-                              alt="gho"
-                              className="h-5 aspect-square"
-                            />
-                            <p>to</p>
-                            <img
-                              src="/dai.svg"
-                              alt="dai"
-                              className="h-5 aspect-square"
-                            />
-                          </div>
-                        )}
+                      <TableCell className="font-medium">
+                        {item.from.slice(0, 8) +
+                          "..." +
+                          item.from.slice(-8)}
                       </TableCell>
-                      <TableCell className="text-right">$250.00</TableCell>
+                      <TableCell>{item.transactionType}</TableCell>
+                      <TableCell>{item.transactionType}</TableCell>
+                      <TableCell>
+                        {item.interactedWith.slice(0, 8) +
+                          "..." +
+                          item.interactedWith.slice(-8)}
+                      </TableCell>
+                      <TableCell className="text-right">{Number(item.amount) / 1e18}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
