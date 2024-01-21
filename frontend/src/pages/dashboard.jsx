@@ -277,7 +277,7 @@ export default function Dashboard() {
               <DialogDescription>
                 <div>
                   <Formik
-                    initialValues={{amount: ""}}
+                    initialValues={{amount: "", chain: ""}}
                     onSubmit={(values) => {
                       console.log(values.amount * 1e18);
                       supplyLiquidity({
@@ -301,15 +301,37 @@ export default function Dashboard() {
                                 placeholder="0.00"
                                 className="flex-1 appearance-none focus-visible:ring-0 shadow-none border-none outline-none text-lg"
                               />
-
-                              <div className="flex gap-2 items-center pr-4">
-                                <img
-                                  src="/gho.svg"
-                                  alt="gho"
-                                  className="h-5 aspect-square"
-                                />
-                                <p>GHO</p>
-                              </div>
+                              <Select
+                                onValueChange={(val) => {
+                                  formik.setFieldValue("chain", val);
+                                }}
+                              >
+                                <SelectTrigger className="w-fit shadow-none">
+                                  <SelectValue placeholder="Select Chain" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="light" className="w-fit">
+                                    <div className="flex gap-2 items-center pr-4">
+                                      <img
+                                        src="/eth.png"
+                                        alt="eth"
+                                        className="h-5 aspect-square"
+                                      />
+                                      <p>Sepolia Ethereum</p>
+                                    </div>
+                                  </SelectItem>
+                                  <SelectItem value="dark">
+                                    <div className="flex gap-2 items-center pr-4">
+                                      <img
+                                        src="/arbitrum.png"
+                                        alt="arbitrum"
+                                        className="h-5 aspect-square"
+                                      />
+                                      <p>Sepolia Arbitrum</p>
+                                    </div>
+                                  </SelectItem>
+                                </SelectContent>
+                              </Select>
                             </div>
                             <div className="ml-3 text-xs flex justify-between mr-3">
                               <div>$34</div>
