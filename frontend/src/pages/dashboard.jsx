@@ -1,7 +1,7 @@
-import { ModeToggle } from "@/components/Toggletheme";
-import { Button } from "@/components/ui/button";
-import { useRouter } from "next/navigation";
-import { useContext, useEffect, useState } from "react";
+import {ModeToggle} from "@/components/Toggletheme";
+import {Button} from "@/components/ui/button";
+import {useRouter} from "next/navigation";
+import {useContext, useEffect, useState} from "react";
 import {
   Table,
   TableBody,
@@ -11,15 +11,13 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-
-import { useAccount, useNetwork, useSwitchNetwork } from "wagmi";
-import { disconnect } from "@wagmi/core";
-
-import { toast } from "@/components/ui/use-toast";
-import { ConnectKitButton } from "connectkit";
-import { useTheme } from "next-themes";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {useAccount, useNetwork, useSwitchNetwork} from "wagmi";
+import {disconnect} from "@wagmi/core";
+import {toast} from "@/components/ui/use-toast";
+import {ConnectKitButton} from "connectkit";
+import {useTheme} from "next-themes";
+import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
+import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {
   Select,
   SelectContent,
@@ -36,10 +34,9 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import useWeb3Context from "../hooks/useWeb3Context";
-
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { ErrorMessage, Field, Form, Formik } from "formik";
+import {Label} from "@/components/ui/label";
+import {Input} from "@/components/ui/input";
+import {ErrorMessage, Field, Form, Formik} from "formik";
 import * as Yup from "yup";
 import {
   Tooltip,
@@ -55,14 +52,15 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Menu } from "lucide-react";
+import {Menu} from "lucide-react";
+import {ReloadIcon} from "@radix-ui/react-icons";
 
 export default function Dashboard() {
-  const { isConnected, address } = useAccount();
-  const { chain } = useNetwork();
+  const {isConnected, address} = useAccount();
+  const {chain} = useNetwork();
   const [mounted, setMounted] = useState(false);
   const router = useRouter();
-  const { chains, switchNetwork } = useSwitchNetwork();
+  const {chains, switchNetwork} = useSwitchNetwork();
 
   // open all modals
   const [openStakingModal, setOpenStakingModal] = useState(false);
@@ -96,7 +94,7 @@ export default function Dashboard() {
     getAllTransactions,
     transferToUser,
 
-    transferDAIisSuccess
+    transferDAIisSuccess,
   } = useWeb3Context();
 
   const [addMemberModal, setAddMemberModal] = useState(false);
@@ -106,7 +104,6 @@ export default function Dashboard() {
   const [borrowAmt, setBorrowAmt] = useState(0);
   const [daiBalance, setDaiBalance] = useState(0);
   const [allTransactions, setAllTransactions] = useState([]);
-
 
   useEffect(() => {
     (async function () {
@@ -137,8 +134,6 @@ export default function Dashboard() {
       let balance = await getGHOBalance();
       setGHOBalance(balance.data);
       console.log("GHO balance: ", balance);
-
-
     })();
   }, []);
 
@@ -170,11 +165,11 @@ export default function Dashboard() {
     fetchMembers();
   }, []);
 
-  function addMemberDashboard({ role, address }) {
+  function addMemberDashboard({role, address}) {
     if (role === "facilitator") {
-      addNewFacilitator({ args: [address] });
+      addNewFacilitator({args: [address]});
     } else {
-      addNewMember({ args: [address] });
+      addNewMember({args: [address]});
     }
   }
 
@@ -201,10 +196,8 @@ export default function Dashboard() {
         let daiBalance = await getDaiBalance();
         setDaiBalance(daiBalance.data);
       }
-    })()
-
+    })();
   }, [transferDAIisSuccess]);
-
 
   const theme = useTheme();
 
@@ -227,7 +220,7 @@ export default function Dashboard() {
             <DialogTitle>Fund your Contract with DAI</DialogTitle>
             <DialogDescription className="h-fit">
               <Formik
-                initialValues={{ amount: "" }}
+                initialValues={{amount: ""}}
                 onSubmit={(values) => {
                   console.log(values.amount * 1e18);
                   transferDAI({
@@ -263,7 +256,7 @@ export default function Dashboard() {
                         </div>
                       </div>
 
-                      <Button type="submit" style={{ marginTop: "20px" }}>
+                      <Button type="submit" style={{marginTop: "20px"}}>
                         Submit
                       </Button>
                     </div>
@@ -275,6 +268,9 @@ export default function Dashboard() {
         </DialogContent>
       </Dialog>
 
+      <div className="absolute top-4 left-5 md:hidden">
+        <ConnectKitButton mode={theme.theme} />
+      </div>
       <div className="absolute top-5 right-10">
         <div className="flex space-x-5 items-center">
           <Button
@@ -291,7 +287,9 @@ export default function Dashboard() {
           >
             Send GHO
           </Button>
-          <ConnectKitButton mode={theme.theme} />
+          <div className="hidden md:block">
+            <ConnectKitButton mode={theme.theme} />
+          </div>
           <div className="xl:hidden">
             <DropdownMenu className="xl:hidden">
               <DropdownMenuTrigger>
@@ -322,7 +320,7 @@ export default function Dashboard() {
               <DialogDescription>
                 <div>
                   <Formik
-                    initialValues={{ amount: "", chain: "" }}
+                    initialValues={{amount: "", chain: ""}}
                     onSubmit={(values) => {
                       console.log(values.amount * 1e18);
                       supplyLiquidity({
@@ -388,7 +386,7 @@ export default function Dashboard() {
                               </div>
                             </div>
                           </div>
-                          <Button type="submit" style={{ marginTop: "20px" }}>
+                          <Button type="submit" style={{marginTop: "20px"}}>
                             Submit
                           </Button>
                         </div>
@@ -594,7 +592,7 @@ export default function Dashboard() {
                 size="sm"
                 onClick={() => {
                   console.log(daiBalance);
-                  approveDAI({ args: [daiBalance, poolAddress] });
+                  approveDAI({args: [daiBalance, poolAddress]});
                 }}
               >
                 Approve DAI
@@ -606,7 +604,7 @@ export default function Dashboard() {
 
       <div
         className="grid grid-cols-1 gap-4 p-8 xl:grid-cols-3 xl:grid-rows-5 w-full"
-      // style={{gridTemplateColumns: `repeat(auto-fit, minmax(400px, 1fr))`}}
+        // style={{gridTemplateColumns: `repeat(auto-fit, minmax(400px, 1fr))`}}
       >
         <Dialog open={addMemberModal} onOpenChange={setAddMemberModal}>
           <DialogContent>
@@ -614,7 +612,7 @@ export default function Dashboard() {
               <DialogTitle>Add New Member</DialogTitle>
               <DialogDescription className="h-fit">
                 <Formik
-                  initialValues={{ role: "", address: "" }}
+                  initialValues={{role: "", address: ""}}
                   onSubmit={(values, _) => {
                     addMemberDashboard(values);
                     console.log(values);
@@ -657,7 +655,14 @@ export default function Dashboard() {
                         </Select>
                         <ErrorMessage name="role" />
                       </div>
-                      <Button type="submit">Submit</Button>
+                      {loading6 || loading7 ? (
+                        <Button disabled>
+                          <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
+                          Please wait
+                        </Button>
+                      ) : (
+                        <Button type="submit">Submit</Button>
+                      )}
                     </Form>
                   )}
                 </Formik>
@@ -668,14 +673,36 @@ export default function Dashboard() {
         <Card className="h-full w-full rounded-xl xl:row-span-full">
           <CardHeader className="flex flex-row items-center justify-between mt-1">
             <CardTitle className="">All Members</CardTitle>
-            <Button
-              className="m-0 w-fit"
-              size={"sm"}
-              variant="outline"
-              onClick={() => setAddMemberModal((prev) => !prev)}
-            >
-              Add New Member
-            </Button>
+            {console.log(allMembers, "addr")}
+            {allMembers && !allMembers[address] ? (
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger>
+                    <Button
+                      className="m-0 w-fit"
+                      size={"sm"}
+                      variant="outline"
+                      onClick={() => setAddMemberModal((prev) => !prev)}
+                      disabled
+                    >
+                      Add New Member
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Add to library</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            ) : (
+              <Button
+                className="m-0 w-fit"
+                size={"sm"}
+                variant="outline"
+                onClick={() => setAddMemberModal((prev) => !prev)}
+              >
+                Add New Member
+              </Button>
+            )}
           </CardHeader>
           <CardContent className="m-0 p-0 pb-4">
             <div className="card-scroll px-6 py-2 overflow-y-scroll space-y-8 h-full">
@@ -701,7 +728,7 @@ export default function Dashboard() {
                   </div>
                   <Select
                     onValueChange={() =>
-                      toggleFacilitator({ args: [memberAddress] })
+                      toggleFacilitator({args: [memberAddress]})
                     }
                     disabled={address === memberAddress}
                     defaultValue={
@@ -740,7 +767,7 @@ export default function Dashboard() {
                 <DialogDescription className="h-fit">
                   <div>
                     <Formik
-                      initialValues={{ amount: "" }}
+                      initialValues={{amount: ""}}
                       onSubmit={(values) => {
                         console.log(values.amount * 1e18);
                         supplyLiquidity({
@@ -810,10 +837,11 @@ export default function Dashboard() {
               <Table>
                 <TableHeader>
                   <TableRow className="">
-                    <TableHead className="w-[150px]">Coin</TableHead>
+                    <TableHead className="w-[100px]">Coin</TableHead>
                     {/* <TableHead>Balance</TableHead> */}
                     <TableHead>Type</TableHead>
                     <TableHead className="text-right">Balance</TableHead>
+                    <TableHead className="text-right"></TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -830,6 +858,11 @@ export default function Dashboard() {
                     <TableCell className="text-right">
                       {Number(suppliedAmt) / 1e18} DAI
                     </TableCell>
+                    <TableCell className="text-right">
+                      <Button size="sm" variant="outline">
+                        Withdraw
+                      </Button>
+                    </TableCell>
                   </TableRow>
                 </TableBody>
               </Table>
@@ -840,10 +873,10 @@ export default function Dashboard() {
           <Dialog open={openWithdrawModal} onOpenChange={setOpenWithdrawModal}>
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>Withdraw</DialogTitle>
+                <DialogTitle>Borrow</DialogTitle>
                 <DialogDescription>
                   <Formik
-                    initialValues={{ amount: "" }}
+                    initialValues={{amount: ""}}
                     onSubmit={(values) => console.log(values)}
                   >
                     {(formik) => (
@@ -869,7 +902,7 @@ export default function Dashboard() {
                                   alt="gho"
                                   className="h-5 aspect-square"
                                 />
-                                <p>DAI</p>
+                                <p>GHO</p>
                               </div>
                             </div>
                             <div className="ml-3 text-xs flex justify-between mr-3">
@@ -907,10 +940,11 @@ export default function Dashboard() {
               <Table>
                 <TableHeader>
                   <TableRow className="">
-                    <TableHead className="w-[150px]">Coin</TableHead>
+                    <TableHead className="w-[100px]">Coin</TableHead>
                     {/* <TableHead>Balance</TableHead> */}
                     <TableHead>Type</TableHead>
                     <TableHead className="text-right">Balance</TableHead>
+                    <TableHead className="text-right"></TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -924,7 +958,12 @@ export default function Dashboard() {
                       <p>GHO</p>
                     </TableCell>
                     <TableCell>Stable Coin</TableCell>
-                    <TableCell className="text-right">{Number(borrowAmt) / 1e18} GHO</TableCell>
+                    <TableCell className="text-right">$250.00</TableCell>
+                    <TableCell className="text-right">
+                      <Button size="sm" variant="outline">
+                        Repay
+                      </Button>
+                    </TableCell>
                   </TableRow>
                 </TableBody>
               </Table>
@@ -954,9 +993,7 @@ export default function Dashboard() {
                   {allTransactions.map((item, index) => (
                     <TableRow key={index}>
                       <TableCell className="font-medium">
-                        {item.from.slice(0, 8) +
-                          "..." +
-                          item.from.slice(-8)}
+                        {item.from.slice(0, 8) + "..." + item.from.slice(-8)}
                       </TableCell>
                       <TableCell>{item.transactionType}</TableCell>
                       <TableCell>{item.transactionType}</TableCell>
@@ -965,7 +1002,9 @@ export default function Dashboard() {
                           "..." +
                           item.interactedWith.slice(-8)}
                       </TableCell>
-                      <TableCell className="text-right">{Number(item.amount) / 1e18}</TableCell>
+                      <TableCell className="text-right">
+                        {Number(item.amount) / 1e18}
+                      </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>

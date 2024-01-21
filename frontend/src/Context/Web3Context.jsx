@@ -1,14 +1,14 @@
-import { createContext, useState } from "react";
+import {createContext, useState} from "react";
 import DAIabi from "../constant/DAI-abi.json";
-import { ABI as abi } from "@/constant/abi";
-import { useContractWrite, useContractRead } from "wagmi";
-import { useToast } from "@/components/ui/use-toast";
+import {ABI as abi} from "@/constant/abi";
+import {useContractWrite, useContractRead} from "wagmi";
+import {useToast} from "@/components/ui/use-toast";
 
 export const Web3Context = createContext();
 
-const Web3ContextProvider = ({ children }) => {
+const Web3ContextProvider = ({children}) => {
   // toast
-  const { toast } = useToast();
+  const {toast} = useToast();
 
   const [contractAddress, setContractAddress] = useState(
     "0x1152B04B6f5E8BA27192425b0313D07D1127E369"
@@ -20,7 +20,7 @@ const Web3ContextProvider = ({ children }) => {
 
   // contract read
 
-  const { refetch: getDaiBalance } = useContractRead({
+  const {refetch: getDaiBalance} = useContractRead({
     address: contractAddress,
     abi: abi,
     functionName: "getBalanceOf",
@@ -70,7 +70,6 @@ const Web3ContextProvider = ({ children }) => {
     functionName: "getAllFacilitators",
   });
 
-
   const {
     data: getPool,
     error: error13,
@@ -110,8 +109,6 @@ const Web3ContextProvider = ({ children }) => {
     abi: abi,
     functionName: "getAllTransactions",
   });
-
-
 
   // contract write
 
@@ -206,7 +203,6 @@ const Web3ContextProvider = ({ children }) => {
     functionName: "transferToUser",
   });
 
-
   // if (
   //   error1 ||
   //   error2 ||
@@ -273,7 +269,7 @@ const Web3ContextProvider = ({ children }) => {
         getBorrowAmt,
         getAllTransactions,
         transferToUser,
-        transferDAIisSuccess
+        transferDAIisSuccess,
       }}
     >
       {children}
