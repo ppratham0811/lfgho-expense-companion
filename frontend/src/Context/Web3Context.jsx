@@ -1,17 +1,17 @@
-import {createContext, useState} from "react";
+import { createContext, useState } from "react";
 import DAIabi from "../constant/DAI-abi.json";
-import {ABI as abi} from "@/constant/abi";
-import {useContractWrite, useContractRead} from "wagmi";
-import {useToast} from "@/components/ui/use-toast";
+import { ABI as abi } from "@/constant/abi";
+import { useContractWrite, useContractRead } from "wagmi";
+import { useToast } from "@/components/ui/use-toast";
 
 export const Web3Context = createContext();
 
-const Web3ContextProvider = ({children}) => {
+const Web3ContextProvider = ({ children }) => {
   // toast
-  const {toast} = useToast();
+  const { toast } = useToast();
 
   const [contractAddress, setContractAddress] = useState(
-    "0xCa89aA2EF640AC4829503195e3b17C58aCfbdd39"
+    "0xF785dE5A1bB5C419f2a26e2ccB8d12BD07d9Ad6e"
   );
 
   const DAIaddress = "0xFF34B3d4Aee8ddCd6F9AFFFB6Fe49bD371b8a357";
@@ -20,7 +20,7 @@ const Web3ContextProvider = ({children}) => {
 
   // contract read
 
-  const {refetch: getDaiBalance} = useContractRead({
+  const { refetch: getDaiBalance } = useContractRead({
     address: contractAddress,
     abi: abi,
     functionName: "getBalanceOf",
@@ -46,8 +46,7 @@ const Web3ContextProvider = ({children}) => {
   } = useContractRead({
     address: contractAddress,
     abi: abi,
-    functionName: "getBalanceOf",
-    args: [GHOaddress],
+    functionName: "getBalanceGHO",
   });
 
   const {
@@ -221,6 +220,7 @@ const Web3ContextProvider = ({children}) => {
   const {
     write: sendGhoCrossChain,
     error: error19,
+    data: crossChainHash,
     isLoading: loading19,
   } = useContractWrite({
     address: contractAddress,
@@ -312,6 +312,7 @@ const Web3ContextProvider = ({children}) => {
         loading7,
         loading12,
         approveDAIisSuccess,
+        crossChainHash,
       }}
     >
       {children}
