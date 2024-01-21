@@ -11,10 +11,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-
 import { useAccount, useNetwork, useSwitchNetwork } from "wagmi";
 import { disconnect } from "@wagmi/core";
-
 import { toast } from "@/components/ui/use-toast";
 import { ConnectKitButton } from "connectkit";
 import { useTheme } from "next-themes";
@@ -36,7 +34,6 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import useWeb3Context from "../hooks/useWeb3Context";
-
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { ErrorMessage, Field, Form, Formik } from "formik";
@@ -56,6 +53,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Menu } from "lucide-react";
+import { ReloadIcon } from "@radix-ui/react-icons";
 
 export default function Dashboard() {
   const { isConnected, address } = useAccount();
@@ -79,7 +77,7 @@ export default function Dashboard() {
     contractAddress,
     transferDAI,
     approveDAI,
-    daiBalance,
+    getDaiBalance,
     supplyLiquidity,
     aDaiBalance: getADAIBalance,
     GHOBalance: getGHOBalance,
@@ -88,17 +86,46 @@ export default function Dashboard() {
     addNewMember,
     addNewFacilitator,
     toggleFacilitator,
+    borrowGHO,
+    getPool: poolAddress,
+    transferGHOToMetamask,
+    getsuppliedAmt,
+    getBorrowAmt,
+    getAllTransactions,
+    transferToUser,
+
+    transferDAIisSuccess,
   } = useWeb3Context();
 
   const [addMemberModal, setAddMemberModal] = useState(false);
 
   const [openFundContractModal, setOpenFundContractModal] = useState(false);
+  const [suppliedAmt, setSuppliedAmt] = useState(0);
+  const [borrowAmt, setBorrowAmt] = useState(0);
+  const [daiBalance, setDaiBalance] = useState(0);
+  const [allTransactions, setAllTransactions] = useState([]);
 
   useEffect(() => {
     (async function () {
       let balance = await getADAIBalance();
       setaDaiBalance(balance.data);
       console.log("adai balance: ", balance);
+
+      let daiBalance = await getDaiBalance();
+      setDaiBalance(daiBalance.data);
+      console.log("dai balance: ", daiBalance.data);
+
+      let suppliedAmt = await getsuppliedAmt();
+      setSuppliedAmt(suppliedAmt.data);
+      console.log("suppliedAmt: ", suppliedAmt);
+
+      let borrowAmt = await getBorrowAmt();
+      setBorrowAmt(borrowAmt.data);
+      console.log("borrowAmt: ", borrowAmt);
+
+      let transactions = await getAllTransactions();
+      setAllTransactions(transactions.data);
+      console.log("transactions: ", transactions);
     })();
   }, []);
 
@@ -161,6 +188,17 @@ export default function Dashboard() {
     });
   };
 
+  // loading useEffects
+
+  useEffect(() => {
+    (async function () {
+      if (transferDAIisSuccess) {
+        let daiBalance = await getDaiBalance();
+        setDaiBalance(daiBalance.data);
+      }
+    })();
+  }, [transferDAIisSuccess]);
+
   const theme = useTheme();
 
   const [direction, setDirection] = useState("left");
@@ -217,7 +255,8 @@ export default function Dashboard() {
                           </div>
                         </div>
                       </div>
-                      <Button type="submit" className="mt-[10px]">
+
+                      <Button type="submit" style={{ marginTop: "20px" }}>
                         Submit
                       </Button>
                     </div>
@@ -229,6 +268,9 @@ export default function Dashboard() {
         </DialogContent>
       </Dialog>
 
+      <div className="absolute top-4 left-5 md:hidden">
+        <ConnectKitButton mode={theme.theme} />
+      </div>
       <div className="absolute top-5 right-10">
         <div className="flex space-x-5 items-center">
           <Button
@@ -245,7 +287,9 @@ export default function Dashboard() {
           >
             Send GHO
           </Button>
-          <ConnectKitButton mode={theme.theme} />
+          <div className="hidden md:block">
+            <ConnectKitButton mode={theme.theme} />
+          </div>
           <div className="xl:hidden">
             <DropdownMenu className="xl:hidden">
               <DropdownMenuTrigger>
@@ -272,8 +316,85 @@ export default function Dashboard() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Send GHO</DialogTitle>
-            <div className="h-[500px] w-[600px]">
-              <DialogDescription></DialogDescription>
+            <div className="h-fit w-full">
+              <DialogDescription>
+                <div>
+                  <Formik
+                    initialValues={{ amount: "", chain: "" }}
+                    onSubmit={(values) => {
+                      console.log(values.amount * 1e18);
+                      supplyLiquidity({
+                        args: [values.amount * 1e18],
+                      });
+                    }}
+                  >
+                    {(formik) => (
+                      <Form>
+                        <div className="w-full p-4 flex flex-col space-y-3">
+                          <Label htmlFor="email" className="ml-1">
+                            Amount
+                          </Label>
+                          <div className="w-full border-[1px] border-slate-200 h-16 rounded-lg flex flex-col">
+                            <div className="flex h-[60%]">
+                              <Field
+                                as={Input}
+                                name="amount"
+                                type="number"
+                                id="amount"
+                                placeholder="0.00"
+                                className="flex-1 appearance-none focus-visible:ring-0 shadow-none border-none outline-none text-lg"
+                              />
+                              <Select
+                                onValueChange={(val) => {
+                                  formik.setFieldValue("chain", val);
+                                }}
+                              >
+                                <SelectTrigger className="w-fit shadow-none">
+                                  <SelectValue placeholder="Select Chain" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="light" className="w-fit">
+                                    <div className="flex gap-2 items-center pr-4">
+                                      <img
+                                        src="/eth.png"
+                                        alt="eth"
+                                        className="h-5 aspect-square"
+                                      />
+                                      <p>Sepolia Ethereum</p>
+                                    </div>
+                                  </SelectItem>
+                                  <SelectItem value="dark">
+                                    <div className="flex gap-2 items-center pr-4">
+                                      <img
+                                        src="/arbitrum.png"
+                                        alt="arbitrum"
+                                        className="h-5 aspect-square"
+                                      />
+                                      <p>Sepolia Arbitrum</p>
+                                    </div>
+                                  </SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+                            <div className="ml-3 text-xs flex justify-between mr-3">
+                              <div>$34</div>
+                              <div className="flex text-xs gap-1">
+                                <div>GHO Balance: 2</div>
+                                <p className="font-bold cursor-pointer hover:bg-gray-200">
+                                  MAX
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                          <Button type="submit" style={{ marginTop: "20px" }}>
+                            Submit
+                          </Button>
+                        </div>
+                      </Form>
+                    )}
+                  </Formik>
+                </div>
+              </DialogDescription>
             </div>
           </DialogHeader>
         </DialogContent>
@@ -471,7 +592,7 @@ export default function Dashboard() {
                 size="sm"
                 onClick={() => {
                   console.log(daiBalance);
-                  approveDAI({ args: [daiBalance, contractAddress] });
+                  approveDAI({ args: [daiBalance, poolAddress] });
                 }}
               >
                 Approve DAI
@@ -534,7 +655,14 @@ export default function Dashboard() {
                         </Select>
                         <ErrorMessage name="role" />
                       </div>
-                      <Button type="submit">Submit</Button>
+                      {loading6 || loading7 ? (
+                        <Button disabled>
+                          <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
+                          Please wait
+                        </Button>
+                      ) : (
+                        <Button type="submit">Submit</Button>
+                      )}
                     </Form>
                   )}
                 </Formik>
@@ -545,14 +673,36 @@ export default function Dashboard() {
         <Card className="h-full w-full rounded-xl xl:row-span-full">
           <CardHeader className="flex flex-row items-center justify-between mt-1">
             <CardTitle className="">All Members</CardTitle>
-            <Button
-              className="m-0 w-fit"
-              size={"sm"}
-              variant="outline"
-              onClick={() => setAddMemberModal((prev) => !prev)}
-            >
-              Add New Member
-            </Button>
+            {console.log(allMembers, "addr")}
+            {allMembers && !allMembers[address] ? (
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger>
+                    <Button
+                      className="m-0 w-fit"
+                      size={"sm"}
+                      variant="outline"
+                      onClick={() => setAddMemberModal((prev) => !prev)}
+                      disabled
+                    >
+                      Add New Member
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Add to library</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            ) : (
+              <Button
+                className="m-0 w-fit"
+                size={"sm"}
+                variant="outline"
+                onClick={() => setAddMemberModal((prev) => !prev)}
+              >
+                Add New Member
+              </Button>
+            )}
           </CardHeader>
           <CardContent className="m-0 p-0 pb-4">
             <div className="card-scroll px-6 py-2 overflow-y-scroll space-y-8 h-full">
@@ -687,10 +837,11 @@ export default function Dashboard() {
               <Table>
                 <TableHeader>
                   <TableRow className="">
-                    <TableHead className="w-[150px]">Coin</TableHead>
+                    <TableHead className="w-[100px]">Coin</TableHead>
                     {/* <TableHead>Balance</TableHead> */}
                     <TableHead>Type</TableHead>
                     <TableHead className="text-right">Balance</TableHead>
+                    <TableHead className="text-right"></TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -705,7 +856,12 @@ export default function Dashboard() {
                     </TableCell>
                     <TableCell>Collateral</TableCell>
                     <TableCell className="text-right">
-                      {Number(daiBalance) / 1e18} DAI
+                      {Number(suppliedAmt) / 1e18} DAI
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <Button size="sm" variant="outline">
+                        Withdraw
+                      </Button>
                     </TableCell>
                   </TableRow>
                 </TableBody>
@@ -717,7 +873,7 @@ export default function Dashboard() {
           <Dialog open={openWithdrawModal} onOpenChange={setOpenWithdrawModal}>
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>Withdraw</DialogTitle>
+                <DialogTitle>Borrow</DialogTitle>
                 <DialogDescription>
                   <Formik
                     initialValues={{ amount: "" }}
@@ -746,7 +902,7 @@ export default function Dashboard() {
                                   alt="gho"
                                   className="h-5 aspect-square"
                                 />
-                                <p>DAI</p>
+                                <p>GHO</p>
                               </div>
                             </div>
                             <div className="ml-3 text-xs flex justify-between mr-3">
@@ -784,10 +940,11 @@ export default function Dashboard() {
               <Table>
                 <TableHeader>
                   <TableRow className="">
-                    <TableHead className="w-[150px]">Coin</TableHead>
+                    <TableHead className="w-[100px]">Coin</TableHead>
                     {/* <TableHead>Balance</TableHead> */}
                     <TableHead>Type</TableHead>
                     <TableHead className="text-right">Balance</TableHead>
+                    <TableHead className="text-right"></TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -801,7 +958,12 @@ export default function Dashboard() {
                       <p>GHO</p>
                     </TableCell>
                     <TableCell>Stable Coin</TableCell>
-                    <TableCell className="text-right">$250.00</TableCell>
+                    <TableCell className="text-right">{Number(borrowAmt) / 1e18} GHO</TableCell>
+                    <TableCell className="text-right">
+                      <Button size="sm" variant="outline">
+                        Repay
+                      </Button>
+                    </TableCell>
                   </TableRow>
                 </TableBody>
               </Table>
@@ -811,7 +973,7 @@ export default function Dashboard() {
         <div className="h-full w-full xl:row-start-3 xl:row-end-6 xl:col-span-2">
           <Card className="w-full overflow-y-scroll relative px-3 card-scroll h-[300px]">
             <CardHeader className="sticky top-0 bg-white dark:bg-background z-10">
-              <CardTitle>Your Transactions</CardTitle>
+              <CardTitle>All Transactions</CardTitle>
             </CardHeader>
             <CardContent className="card-content relative">
               <Table className="h-full w-full relative">
@@ -820,7 +982,7 @@ export default function Dashboard() {
                     <TableHead className="w-[100px]">Address</TableHead>
                     <TableHead>Type</TableHead>
                     <TableHead>Role</TableHead>
-                    <TableHead>Method</TableHead>
+                    <TableHead>Interacted with</TableHead>
                     <TableHead className="text-right">Amount</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -828,30 +990,21 @@ export default function Dashboard() {
                 <TableBody>
                   {" "}
                   {/* Set a max height for the table body */}
-                  {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((item, index) => (
+                  {allTransactions.map((item, index) => (
                     <TableRow key={index}>
-                      <TableCell className="font-medium">{"0x..."}</TableCell>
-                      <TableCell>Stake</TableCell>
-                      <TableCell>Facilitator</TableCell>
-                      <TableCell>
-                        {direction === "left" && (
-                          <div className="flex gap-2">
-                            <p>Stake</p>
-                            <img
-                              src="/gho.svg"
-                              alt="gho"
-                              className="h-5 aspect-square"
-                            />
-                            <p>to</p>
-                            <img
-                              src="/dai.svg"
-                              alt="dai"
-                              className="h-5 aspect-square"
-                            />
-                          </div>
-                        )}
+                      <TableCell className="font-medium">
+                        {item.from.slice(0, 8) + "..." + item.from.slice(-8)}
                       </TableCell>
-                      <TableCell className="text-right">$250.00</TableCell>
+                      <TableCell>{item.transactionType}</TableCell>
+                      <TableCell>{allMembers[item.from] ? "Facilitator" : "Member"}</TableCell>
+                      <TableCell>
+                        {item.interactedWith.slice(0, 8) +
+                          "..." +
+                          item.interactedWith.slice(-8)}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        {Number(item.amount) / 1e18}
+                      </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
