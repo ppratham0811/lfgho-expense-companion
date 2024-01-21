@@ -17,6 +17,8 @@ contract PoolBorrow {
     IPool public immutable POOL =
         IPool(0x6Ae43d3271ff6888e7Fc43Fd7321a503ff738951);
     address private daiAddress = 0xFF34B3d4Aee8ddCd6F9AFFFB6Fe49bD371b8a357;
+    address private GhoAddress = 0xc4bF5CbDaBE595361438F8c6a187bDc330539c60;
+    IERC20 private gho = IERC20(GhoAddress);
     IERC20 private dai = IERC20(daiAddress);
     // address payable owner;
 
@@ -133,18 +135,15 @@ contract PoolBorrow {
     }
 
     function sendGHO(address _reciever, uint256 _amount) public {
-        IERC20 ghoTokenAddress = IERC20(
-            0xc4bF5CbDaBE595361438F8c6a187bDc330539c60
-        );
         require(
-            ghoTokenAddress.balanceOf(address(this)) >= _amount,
+            gho.balanceOf(address(this)) >= _amount,
             "Insufficient GHO balance"
         );
-        ghoTokenAddress.transfer(_reciever, _amount);
+        gho.transfer(_reciever, _amount);
     }
 
     function supplyLiquidity(uint256 _amount) external {
-        address asset = 0xFF34B3d4Aee8ddCd6F9AFFFB6Fe49bD371b8a357;
+        address asset = daiAddress;
         uint256 amount = _amount;
         address onBehalfOf = address(this);
         uint16 referralCode = 0;
@@ -169,13 +168,7 @@ contract PoolBorrow {
         // Check if msg.sender is in facilitators array
         require(checkIfFacilitator(msg.sender), "Sender is not a facilitator");
 
-        POOL.borrow(
-            0xc4bF5CbDaBE595361438F8c6a187bDc330539c60,
-            amount,
-            2,
-            0,
-            address(this)
-        );
+        POOL.borrow(GhoAddress, amount, 2, 0, address(this));
 
         borrowAmt += amount;
 
@@ -190,15 +183,37 @@ contract PoolBorrow {
         transactions.push(newTransaction);
     }
 
-    function transferToMetamask(uint256 _amount) public {
-        IERC20 ghoTokenAddress = IERC20(
-            0xc4bF5CbDaBE595361438F8c6a187bDc330539c60
-        );
+    function repayGHO(
+        uint256 amount_,
+        uint256 interestRateMode,
+        address addr
+    ) public {
+        require(amount_ > 0, "amount should be greater than 0");
         require(
-            ghoTokenAddress.balanceOf(address(this)) >= _amount,
+            amount_ <= borrowAmt,
+            "amount should be less than or equal to borrow amt"
+        );
+        borrowAmt -= amount_;
+
+        POOL.repay(GhoAddress, amount_, interestRateMode, addr);
+
+        Transaction memory newTransaction = Transaction({
+            from: msg.sender,
+            transactionType: "repayGHO",
+            interactedWith: address(POOL),
+            amount: amount_,
+            timestamp: block.timestamp
+        });
+
+        transactions.push(newTransaction);
+    }
+
+    function transferToMetamask(uint256 _amount) public {
+        require(
+            gho.balanceOf(address(this)) >= _amount,
             "Insufficient GHO balance"
         );
-        ghoTokenAddress.transfer(msg.sender, _amount);
+        gho.transfer(msg.sender, _amount);
 
         Transaction memory newTransaction = Transaction({
             from: msg.sender,
@@ -211,14 +226,11 @@ contract PoolBorrow {
     }
 
     function transferToUser(address _reciever, uint256 _amount) public {
-        IERC20 ghoTokenAddress = IERC20(
-            0xc4bF5CbDaBE595361438F8c6a187bDc330539c60
-        );
         require(
-            ghoTokenAddress.balanceOf(address(this)) >= _amount,
+            gho.balanceOf(address(this)) >= _amount,
             "Insufficient GHO balance"
         );
-        ghoTokenAddress.transfer(_reciever, _amount);
+        gho.transfer(_reciever, _amount);
 
         Transaction memory newTransaction = Transaction({
             from: msg.sender,
@@ -243,19 +255,30 @@ contract PoolBorrow {
         return dai.allowance(address(this), _poolContractAddress);
     }
 
-    function getBalancGHO() external view returns (uint256) {
-        return
-            IERC20(0xc4bF5CbDaBE595361438F8c6a187bDc330539c60).balanceOf(
-                address(this)
-            );
+    function getBalanceGHO() external view returns (uint256) {
+        return gho.balanceOf(address(this));
     }
 
-    function getBalanceOf(address _token) external view returns (uint256) {
+    function getBalanceOf(address _token) public view returns (uint256) {
         return IERC20(_token).balanceOf(address(this));
     }
 
-    // Chain link functions
+    function withdrawDAI(uint256 amount_) public {
+        uint256 adaiBalance = getBalanceOf(
+            0x29598b72eb5CeBd806C5dCD549490FdA35B13cD8
+        );
+        require(amount_ <= adaiBalance, "amount is greater than daiBalance");
+        POOL.withdraw(daiAddress, amount_, msg.sender);
+    }
 
+    function sendGhoToContract(uint256 amount_) public {
+        require(
+            gho.transfer(address(this), amount_),
+            "send gho to contract txn failed"
+        );
+    }
+
+    // Chain link functions
     modifier onlyAllowlistedChain(uint64 _destinationChainSelector) {
         if (!allowlistedChains[_destinationChainSelector])
             revert DestinationChainNotAllowlisted(_destinationChainSelector);
