@@ -2,41 +2,23 @@ import {createContext, useState} from "react";
 import DAIabi from "../constant/DAI-abi.json";
 import {ABI as abi} from "@/constant/abi";
 import {useContractWrite, useContractRead} from "wagmi";
+import {useToast} from "@/components/ui/use-toast";
 
 export const Web3Context = createContext();
 
 const Web3ContextProvider = ({children}) => {
+  // toast
+  const toast = useToast();
+
   const [contractAddress, setContractAddress] = useState(
     "0xF128920a8cBf98Ae62A94Fc3Bf94e4De82EE7081"
   );
 
-  const {write: supplyLiquidity} = useContractWrite({
-    address: contractAddress,
-    abi: abi,
-    functionName: "supplyLiquidity",
-  });
-
-  const {write: borrowGHO} = useContractWrite({
-    address: contractAddress,
-    abi: abi,
-    functionName: "borrowGHO",
-  });
-
-  const {write: transferGHOToMetamask} = useContractWrite({
-    address: contractAddress,
-    abi: abi,
-    functionName: "transferToMetamask",
-  });
-
-  const {write: approveDAI} = useContractWrite({
-    address: contractAddress,
-    abi: abi,
-    functionName: "approveDAI",
-  });
-
   const DAIaddress = "0xFF34B3d4Aee8ddCd6F9AFFFB6Fe49bD371b8a357";
   const aDAIaddress = "0x29598b72eb5CeBd806C5dCD549490FdA35B13cD8";
   const GHOaddress = "0xc4bF5CbDaBE595361438F8c6a187bDc330539c60";
+
+  // contract read
 
   const {data: daiBalance} = useContractRead({
     address: contractAddress,
@@ -45,7 +27,11 @@ const Web3ContextProvider = ({children}) => {
     args: [DAIaddress],
   });
 
-  const {refetch: aDaiBalance} = useContractRead({
+  const {
+    refetch: aDaiBalance,
+    error: error1,
+    isLoading: loading1,
+  } = useContractRead({
     address: contractAddress,
     abi: abi,
     functionName: "getBalanceOf",
@@ -53,48 +39,149 @@ const Web3ContextProvider = ({children}) => {
     watch: true,
   });
 
-  const {refetch: GHOBalance} = useContractRead({
+  const {
+    refetch: GHOBalance,
+    error: error2,
+    isLoading: loading2,
+  } = useContractRead({
     address: contractAddress,
     abi: abi,
     functionName: "getBalanceOf",
     args: [GHOaddress],
   });
 
-  const {refetch: getAllMembers} = useContractRead({
+  const {
+    refetch: getAllMembers,
+    error: error3,
+    isLoading: loading3,
+  } = useContractRead({
     address: contractAddress,
     abi: abi,
     functionName: "getAllMembers",
   });
 
-  const {refetch: getAllFacilitators} = useContractRead({
+  const {
+    refetch: getAllFacilitators,
+    error: error4,
+    isLoading: loading4,
+  } = useContractRead({
     address: contractAddress,
     abi: abi,
     functionName: "getAllFacilitators",
   });
 
-  const {write: transferDAI} = useContractWrite({
+  // contract write
+
+  const {
+    write: transferDAI,
+    error: error5,
+    isLoading: loading5,
+  } = useContractWrite({
     address: DAIaddress,
     abi: DAIabi,
     functionName: "transfer",
   });
 
-  const {write: addNewMember} = useContractWrite({
+  const {
+    write: addNewMember,
+    error: error6,
+    isLoading: loading6,
+  } = useContractWrite({
     address: contractAddress,
     abi: abi,
     functionName: "addMember",
   });
 
-  const {write: addNewFacilitator} = useContractWrite({
+  const {
+    write: addNewFacilitator,
+    error: error7,
+    isLoading: loading7,
+  } = useContractWrite({
     address: contractAddress,
     abi: abi,
     functionName: "addFacilitator",
   });
 
-  const {write: toggleFacilitator} = useContractWrite({
+  const {
+    write: toggleFacilitator,
+    error: error8,
+    isLoading: loading8,
+  } = useContractWrite({
     address: contractAddress,
     abi,
     functionName: "toggleMemberState",
   });
+
+  const {
+    write: supplyLiquidity,
+    error: error9,
+    isLoading: loading9,
+  } = useContractWrite({
+    address: contractAddress,
+    abi: abi,
+    functionName: "supplyLiquidity",
+  });
+
+  const {
+    write: borrowGHO,
+    error: error10,
+    isLoading: loading10,
+  } = useContractWrite({
+    address: contractAddress,
+    abi: abi,
+    functionName: "borrowGHO",
+  });
+
+  const {
+    write: transferGHOToMetamask,
+    error: error11,
+    isLoading: loading11,
+  } = useContractWrite({
+    address: contractAddress,
+    abi: abi,
+    functionName: "transferToMetamask",
+  });
+
+  const {
+    write: approveDAI,
+    error: error12,
+    isLoading: loading12,
+  } = useContractWrite({
+    address: contractAddress,
+    abi: abi,
+    functionName: "approveDAI",
+  });
+
+  if (
+    error1 ||
+    error2 ||
+    error3 ||
+    error4 ||
+    error5 ||
+    error6 ||
+    error7 ||
+    error8 ||
+    error9 ||
+    error10 ||
+    error11 ||
+    error12
+  ) {
+    toast({
+      title: "Error",
+      description:
+        error1 ||
+        error2 ||
+        error3 ||
+        error4 ||
+        error5 ||
+        error6 ||
+        error7 ||
+        error8 ||
+        error9 ||
+        error10 ||
+        error11,
+    });
+  }
 
   return (
     <Web3Context.Provider
